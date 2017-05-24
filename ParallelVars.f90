@@ -2,7 +2,7 @@ MODULE PARALLELVARIABLES
   USE MPI
   USE VARTYPES  
 
-  integer             ::ierr, mype, npes, mygrid 
+  integer             ::ierr, mype, npes, mygrid
   integer             ::stat(MPI_STATUS_SIZE)
   character(len=3)    ::num_char
 

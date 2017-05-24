@@ -16,7 +16,13 @@ MODULE DEBUG
     module procedure output_all
   END INTERFACE output
 
-  logical             ::HUSH = .true. !controls error output (specifically the interpolate function)
+  INTERFACE NaNcatch
+    module procedure NaNcatchReal
+    module procedure NaNcatchDouble
+  END INTERFACE NaNcatch
+
+  logical             ::HUSH = .not. .true. !controls error output (specifically the interpolate function)
+!  logical             ::HUSH = .true. !controls error output (specifically the interpolate function)
                              ! true means silent, false means printing of error functions
   logical             ::DEBUG_GEN = .not. .true. !controls general debugging output
                                   ! true will produce debugging info at every iteration, false will run silently
@@ -24,14 +30,17 @@ MODULE DEBUG
   logical             ::OUTPUT_DENS = .true. !Variable to control outputs for plotting
   logical             ::OUTPUT_TEMP = .true. !Variable to control outputs for plotting
   logical             ::OUTPUT_INTS = .not. .true. !Variable to control outputs for plotting
-                                   ! true means plot, false means silence outputs
+  logical             ::OUTPUT_NL2  = .true. !Variable to control outputs for plotting
+                                  ! true means plot, false means silence outputs
   logical             ::moving_Io = .not. .true. !turns the motion of Io on and off 
+!  logical             ::test_pattern = .not. .true. !allows for testing azimuthal source patterns
   logical             ::test_pattern = .not. .true. !allows for testing azimuthal source patterns
-  logical             ::Upwind = .not. .true. !Uses upwind scheme to handle transport (fast)
+  logical             ::UseLaxWendroff = .true. !Uses Lax Wendroffd scheme to handle azimuthal transport (fast, less diffusive))
+  logical             ::Upwind = .not. .true. !Uses upwind scheme to handle azimuthal transport (fast, diffusive)
   logical             ::Euler  = .not. .true. !Uses Improved euler method to determine transport (slow)
-  logical             ::UseLaxWendroff = .true. !Uses upwind scheme to handle transport (fast)
-  logical             ::sys3hot  = .true. !creates a hot electron population that is sationary in sys3
-  logical             ::sys4hot  = .not. .true. !creates a hot electron population that is sationary in sys3
+  logical             ::sys3hot  = .true. !creates a hot electron population that is stationary in sys3
+  logical             ::sys4hot  = .not. .true. !creates a hot electron population that is mobile in sys3
+
 
   CONTAINS
 
@@ -314,5 +323,61 @@ MODULE DEBUG
     v%elec_elecHot  =a
 
   end subroutine initNu
+
+  subroutine singleout(nl2,nl2e, mype)
+    type(density)     ::n, nl2, nl2e
+!    type(temp)        ::t
+    integer           ::mype
+
+    if(mype .eq. 0) then
+!      print *, "DENSITY"
+!      call output(n)
+      print *, "NL2"
+      call output(nl2)
+      print *, "NL2E"
+      call output(nl2e)
+!      print *, "TEMP"
+!      call output(t)
+    end if
+
+  end subroutine singleout
+
+  function NaNcatchReal(x, line, mype)
+    real              ::x, infinity
+    integer           ::line, mype
+    logical           ::NaNcatchReal
+
+    NaNcatchReal=.false.
+    infinity=HUGE(infinity)
+    if(x .ne. x .or. abs(x) .gt. infinity) then
+      if(.not. HUSH) then
+        print *, x, line, mype
+      endif
+      NaNcatchReal=.true.
+      if(mype .eq. 0) then
+        print *, "TAG"
+      end if
+    end if
+    return 
+  end function NaNcatchReal
+
+  function NaNcatchDouble(x, line, mype)
+    double precision  ::x, infinity
+    integer           ::line, mype
+    logical           ::NaNcatchDouble
+
+    NaNcatchDouble=.false.
+    infinity=HUGE(infinity)
+    if(x .ne. x .or. abs(x) .gt. infinity) then
+      if(.not. HUSH) then
+!        print *, x, line, mype
+      endif
+      NaNcatchDouble=.true.
+      if(mype .eq. 0) then
+!        print *, "TAG"
+      end if
+    end if
+    return 
+  end function NaNcatchDouble
 
 end MODULE DEBUG

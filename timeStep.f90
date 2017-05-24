@@ -2,7 +2,6 @@ MODULE TIMESTEP
 
   USE FUNCTIONS
   USE GLOBAL
-!  USE PARALLELVARIABLES
 
   IMPLICIT NONE
 
@@ -63,6 +62,7 @@ MODULE TIMESTEP
 
     v%elec_elecHot= nu_ee(lat%elec, T%elec, elecHot, T%elecHot) 
     
+!    print *, rdist, v%elec_elecHot, fehot_const
 
   end subroutine updateNu
 
@@ -153,7 +153,7 @@ MODULE TIMESTEP
 
   subroutine gtzero(num)
     double precision  ::num
-    if (num<0) then 
+    if (num<0.0) then 
       num=0.0 
     end if
   end subroutine gtzero
@@ -191,7 +191,7 @@ MODULE TIMESTEP
     EFelec = EF_elec(n, T, h, ind, dep, lat, v, ft)
     updateNT%elec=nrg%elec + dt * EFelec
     call gtzero(updateNT%elec)
-    !print *, nrg%elec, updateNT%elec
+!    print *, rdist, EFelec
 
   end function updateNT
 
@@ -242,8 +242,8 @@ MODULE TIMESTEP
     call gtzero(nTp%o2p )
     nTp%elec  = (nrg%elec  + dt * 0.5 * (EFelec  + EF_elec(n1,T1,h1, ind1,dep1,lat1,nu1, ft1)))
     call gtzero(nTp%elec )
-       
-  end subroutine
+ 
+  end subroutine improvedEuler
 
   subroutine cm3_latavg_model(n, T, nrg, h, v, n1, T1, nrg1, h1, v1, np, Tp, nTp, ind, dep, dep1, lat, lat1, ft, z)
     type(density)   ::n, n1, np
@@ -265,7 +265,7 @@ MODULE TIMESTEP
     call lat_distribution(n, h, lat)
     
     call updateNu(v, lat, T, n%elecHot)
-
+ 
     call fluxCorrect(n, n1, h, ind, dep, ft)
 
     do i=1, LAT_SIZE 
@@ -285,7 +285,6 @@ MODULE TIMESTEP
     call stepNu(v1, n1, lat1, T1)
     mass_loading2=0.0
     call improvedEuler(np, n, n1, T1, h1, ind, dep1, v1, ft, lat1, nTp, nrg)
-
     call update_temp(np, nTp, Tp)
 
     n = np
