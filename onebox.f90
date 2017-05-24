@@ -7,6 +7,7 @@
 
 PROGRAM Onebox
 
+  USE OUTPUTDATA
   USE DEBUG
   USE FUNCTIONS
   USE TIMESTEP 
@@ -14,11 +15,9 @@ PROGRAM Onebox
   USE INPUTS
   USE FTMIX
   USE PARALLELVARIABLES
-  USE OUTPUTS
   USE MPI
 
   IMPLICIT NONE
-
   character(len=8)    ::x1
 
   call MPI_INIT(ierr)
@@ -32,28 +31,28 @@ PROGRAM Onebox
   num_char=trim(x1)  !trim non-existent file and store as num_char
   !num_char can be used to name output files by grid space using "output"//num_char//".dat" 
 
-  if ( npes .ne. LNG_GRID) then
+  if ( npes .ne. LNG_GRID ) then
     print *, "The current version only supports ", LNG_GRID, " processors."   
   else 
    call model()
   endif
- 
+
 call MPI_FINALIZE(ierr)
 
 CONTAINS 
 
 subroutine model()
   integer             ::nit
-  real                ::lontemp, day
-  real                ::tm, tm0
+  real                ::lontemp, day  
+  double precision    ::tm, tm0
   type(density)       ::n, ni, np
   real                ::const
   type(temp)          ::T, Ti, Tp
-  double precision    ::Te0, Ti0, Teh0
+  real                ::Te0, Ti0, Teh0
   type(height)        ::h, hi
   type(r_ind)         ::ind
   type(nT)            ::nrg, nTi, nTp
-  integer             ::i, j, k
+  integer             ::i, j
   real                ::var, var2, n_height
   type(nu)            ::v, vi
   type(r_dep)         ::dep, depi
@@ -65,13 +64,14 @@ subroutine model()
   character(len=8)    ::x1
   character(len=4)    ::day_char
   integer             ::file_num
-  real                ::longitude, elecHot_multiplier, intensity, n_ave, T_ave, test_multiplier, volume, dr
+  real                ::longitude, elecHot_multiplier, intensity, n_ave, T_ave, test_multiplier,volume, dr
 
 !  call initNu(v)
-  longitude = (mype * 360.0 / LNG_GRID)
-
+  longitude = mype * 360.0 / LNG_GRID
+!  v_ion = 2.0!+0.1*cos((longitude-180.0)*dTOr)
+!  v_ion=0.0
   do i=1, LAT_SIZE
-    lat%z(i)= (i-1) * Rj / 10.0  !Initializing lat%z
+    lat%z(i)= (i-1) * Rj / 5.0  !Initializing lat%z
   end do
 
   call readInputs()  !call to input.f90 module to read initial variables from 'input.dat'
@@ -93,58 +93,52 @@ subroutine model()
 
 !set radial distance
   rdist= 6.0   !in Rj
+
   dr=Rj
-  volume=PI*((((rdist*Rj+1.5*Rj)*1.0e5))**2 - ((rdist*Rj)*1.0e5)**2)*0.5*ROOTPI*Rj*1.0e5
+  volume=PI*((((rdist*Rj+1.5*Rj)*1.0e5))**2 - ((rdist*Rj)*1.0e5)**2)*(ROOTPI*0.5*Rj*1.0e5)
+  print *, "volume = ", volume*LNG_GRID
   torus_circumference = Rj * rdist * 2.0 * PI
   dx = torus_circumference / LNG_GRID
   numerical_c_neutral = v_neutral*dt/dx
   numerical_c_ion = v_ion*dt/dx
 
 !set sys3 longitude of box
-  lon3=200
+  lon3=110
 
 !set zoff
-  zoff= abs(6.0* cos((lon3-longitude) * dTOr) * dTOr * rdist * Rj) !in km
+  zoff= abs(6.4 * cos((lon3-longitude) * dTOr) * dTOr * rdist * Rj) !in km
+
   n_height = Rj/2.0
 
-  tm0=0.0
+  tm0=0.01
 
 !set density values
   const=1800.0
 
   test_multiplier=1.0
   if( test_pattern ) then
-!!    if( rdist .gt. 7.0 .and. rdist .lt. 9.0) test_multiplier=4.0
-    test_multiplier=1.0+0.2*cos(2.0*longitude*dTOr)
-  endif
+    test_multiplier= 1.0+0.5*cos(2.0*longitude*dTOr)
+  endif  
 
-!  n%sp = 0.060 * const * test_multiplier* (rdist/6.0)**(-8.0)
-!  n%s2p= 0.212 * const * test_multiplier* (rdist/6.0)**(-8.0)
-!  n%s3p= 0.034 * const * test_multiplier* (rdist/6.0)**(-3.0)
-!  n%op = 0.242 * const * test_multiplier* (rdist/6.0)**(-8.0)
-!  n%o2p= 0.242 * const * test_multiplier* (rdist/6.0)**(-3.0)
+  n%sp = 0.060 * const * test_multiplier
+  n%s2p= 0.212 * const * test_multiplier
+  n%s3p= 0.034 * const * test_multiplier
+  n%op = 0.242 * const * test_multiplier
+  n%o2p= 0.123 * n%op
 
-  n%sp = 150.0 * test_multiplier
-  n%s2p= 600.0 * test_multiplier
-  n%s3p=  100.0 * test_multiplier
-  n%op = 400.0 * test_multiplier
-  n%o2p=  40.0 * test_multiplier
-
-  n%s=50.0 * test_multiplier
-  n%o=100.0 * test_multiplier
+  n%s=25.0 * test_multiplier
+  n%o=50.0 * test_multiplier
 
 
   Te0 = 5.0
   Ti0 = 70.0
   Teh0= tehot
-  if(Teh0 .gt. 400.0) Teh0=400.0
-  n%fh=fehot_const
+!  fehot_const= .0022
   trans = 4.62963e-7
-  net_source=source/volume
+  net_source = source/volume 
 
   n%elec = (n%sp + n%op + 2 * (n%s2p + n%o2p) + 3 * n%s3p) * (1.0 - n%protons)
   n%elecHot = n%fh * n%elec / (1.0-n%fh)
-
   n%fc = 1.0 - n%fh
 
 !set temp values
@@ -164,7 +158,7 @@ subroutine model()
     n%protons = protons
   endif
 
-  ind%o_to_s= o_to_s
+  ind%o_to_s= o_to_s !fix make this read from file 
   ind%o2s_spike=2.0
 
   tau0=transport !1.0/(trans*8.64e4)
@@ -217,18 +211,19 @@ subroutine model()
   sys4_loc=0    !The location of the sys4 hot electron population
   file_num=0    !Output files are numbered so they can be assembled as a animated visualization (refer to scripts)
 
-  mass_loading=1.0 !1e-33 !set to arbitarily small value
-  ave_loading=1.0 !1e-33
+  mass_loading=1.0
+  ave_loading=1.0
 
-!-----------------------Interation loop-------------------------------------------------------------------------------------------------
   do i=1, nit
+!    if( mype .eq. 0 ) then
+!      print *, "((((((((((((((((((( i = ", i, " )))))))))))))))))))"
+!    endif
     tm = tm0 + (i-1) * dt / 86400.0
 
-!----------------------time dependent neutral source rate-------------------------------------------------------------------------------
-    var =exp(-((tm-neutral_t0)/neutral_width)**2)
-    var2 =exp(-((tm-hote_t0)/neutral_width)**2)
+    var  =exp(-((tm-neutral_t0)/neutral_width)**2)
+    var2 =exp(-((tm-hote_t0   )/hote_width   )**2)
 
-  !  net_source = net_source0*(1.0 + neutral_amp*var) !Ubiquitous source
+!    net_source = net_source0*(1.0 + neutral_amp*var) !Ubiquitous source
     if( moving_Io ) then
       if( mype .eq. int(Io_loc*LNG_GRID/torus_circumference) )then
         net_source = LNG_GRID*net_source0*(1.0+neutral_amp*var)
@@ -244,28 +239,26 @@ subroutine model()
     if( .not. moving_Io ) then
       net_source = (net_source0*(1.0 + neutral_amp*var))!/LNG_GRID !ubiquitous
     endif
-!----------------------time dependent neutral source rate-------------------------------------------------------------------------------
 
     ind%o_to_s = o_to_s
 !    ind%o_to_s = (otos + o2s_spike * neutral_amp * var) & !o2s_spike
 !               / (1.0 + neutral_amp * var)
-!    n%fh  = fehot_const * (1.0 + hote_amp * var)
+!    n%fh  = fehot_const * (1.0 + hote_amp * var2)
 
     elecHot_multiplier=1.0
 
-!----------------------hot electrons-------------------------------------------------------------------------------
     if( sys3hot ) then
-      elecHot_multiplier=elecHot_multiplier*(1.0+sys3_amp*(cos((290.0-longitude)*dTOr)))
+      elecHot_multiplier=elecHot_multiplier*(1.0+sys3_amp*(cos((longitude-280.0)*dTOr)))
     endif
 
     if( sys4hot ) then
       elecHot_multiplier=elecHot_multiplier&
              *(1.0+(sys4_amp+(hote_amp*var2))*cos(((mype/(LNG_GRID-1.0))-(sys4_loc/torus_circumference))*2.0*PI))
     endif
+   
+    !elecHot_multiplier=elecHot_multiplier*(1.0+(0.4*(mass_loading/ave_loading)))
 
- !   elecHot_multiplier=elecHot_multiplier*(1.0+0.4*(mass_loading/ave_loading))
-
-    n%fh  = fehot_const * (1.0 + hote_amp * var)*elecHot_multiplier
+    n%fh  = fehot_const * (1.0 + hote_amp * var2)*elecHot_multiplier
 
     ni%fh = n%fh
     np%fh = n%fh
@@ -278,13 +271,15 @@ subroutine model()
     nrg%elecHot = n%elecHot * T%elecHot
 
     do j=1, LAT_SIZE
-      lat%elec(j) = n%elec!*exp(-(lat%z(j)/h%elec)**2)
-      lati%elecHot(j) = n%elecHot!*exp(-(lat%z(j)/h%elec)**2)
+      lat%elecHot(j) = n%elecHot
+      lati%elecHot(j) = n%elecHot
     end do
 
     if ( DEBUG_GEN ) then !this variable set in debug.f90
       call DebugOutput(i, n, h, T, v, nrg)
     endif
+
+!    print *, mype, n%fh
 
     call cm3_latavg_model(n, T, nrg, h, v, ni, Ti, nTi, hi &
                          ,vi, np, Tp, nTp, ind, dep, depi, lat, lati, ft, zoff) 
@@ -321,8 +316,8 @@ subroutine model()
         !endif
         call dens_ave(n_ave, n) 
         call temp_ave(T_ave, T) 
-        do j=0, LNG_GRID - 1
-          if( mype .eq. j) then
+        do j=0, LNG_GRID-1
+          if( mype .eq. j ) then
             if(OUTPUT_DENS) call IonElecOutput(n%sp, n%s2p, n%s3p, n%op, n%o2p, n%elec, longitude, day_char, 'DENS')
             if(OUTPUT_MIXR) then  
               plot = ftint_mix(n, h) !calculate values to be plotted
@@ -360,14 +355,15 @@ subroutine model()
         output_it=output_it + (86400.0/(dt*per_day)) !Determines when data is output. Set for once each run day (86400/dt).
         file_num = file_num + 1
     endif        
- 
+
     call Grid_transport(n, nrg)
-!    isNaN=NaNcatch(n%sp, 100, mype) !fix
+
+!    call MPI_BARRIER(MPI_COMM_WORLD, ierr)
+
     Io_loc = mod(Io_loc+(dt*v_Io), torus_circumference)  
     sys4_loc = mod(sys4_loc+(dt*v_sys4), torus_circumference)  
 
   end do
-!----------------------------------------------------------------------------------------------------------------------------
 
 call FinalOutput(nrgy)
 
@@ -435,7 +431,7 @@ subroutine FinalOutput(nrgy)
   avg%P_in=avg%P_in/LNG_GRID
 
   call MPI_REDUCE(nrgy%Puv, avg%Puv, LNG_GRID, MPI_REAL, MPI_SUM, 0, MPI_COMM_WORLD, ierr)
-  avg%Puv=avg%Puv
+  avg%Puv=avg%Puv/LNG_GRID
 
   call MPI_REDUCE(nrgy%Pfast, avg%Pfast, LNG_GRID, MPI_REAL, MPI_SUM, 0, MPI_COMM_WORLD, ierr)
   avg%Pfast=avg%Pfast/LNG_GRID
@@ -536,6 +532,7 @@ subroutine DebugOutput(i, n, h, T, v, nrg)
   type(nT)            ::nrg
 
   print *,  "||||||||||||||||||||||||||||||||||||||||||||||"
+  print *,  "grid = ", mygrid
   print *,  "grid = ", mygrid
   print *,  "i = ", i-1
   print *,  "||||||||||||||||||||||||||||||||||||||||||||||"
@@ -706,8 +703,9 @@ end function EulerTransport
 double precision function LaxWendroff(left, center, right, cleft, c, cright)
   double precision    :: left, center, right
   real                :: cleft, c, cright
-  
+
   LaxWendroff=center+0.5*(cleft*left - cright*right)+0.5*((cleft**2.0)*left-2.0*c*c*center+(cright**2.0)*right)
+
 
 end function LaxWendroff
 
@@ -717,9 +715,17 @@ double precision function getLoss(v, val)
   integer             ::left, right
 
   getLoss = val * dt * v * LNG_GRID / torus_circumference
-  
-  call MPI_SEND(getLoss, 1, MPI_DOUBLE_PRECISION,  right, 22, MPI_COMM_WORLD, ierr)
+ 
+  left = mype - 1 
+  right= mype + 1
+
+  if( left  < 0 )           left = left+LNG_GRID
+  if( right .ge. LNG_GRID ) right=right-LNG_GRID
+ 
+  call MPI_SEND(getLoss, 1, MPI_DOUBLE_PRECISION, right, 22, MPI_COMM_WORLD, ierr)
   call MPI_RECV(source, 1, MPI_DOUBLE_PRECISION, left, 22, MPI_COMM_WORLD, stat, ierr)
+
+!  print *, mygrid, getLoss, source
 
   getLoss = getLoss - source
 

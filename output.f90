@@ -1,4 +1,4 @@
-MODULE OUTPUTS   
+MODULE OUTPUTDATA
 
 CONTAINS
 
@@ -53,7 +53,7 @@ end subroutine IonElecOutput
 
 subroutine OtherOutput(val, longitude, day_char, quantity)
 real             ::longitude, val
-character(len=4) ::quantity, day_char
+character(len=4) ::quantity, day_char 
 
   open(unit=101, file=''//quantity//day_char//'.dat', status='unknown', position='append')
   write(101,*) longitude, val

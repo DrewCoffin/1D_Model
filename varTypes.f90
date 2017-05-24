@@ -4,26 +4,23 @@
 MODULE varTypes
 
   integer :: EMIS_SIZE, CX_SIZE, LAT_SIZE, REC_ROWS, REC_O, REC_S, LNG_GRID
-  real    ::PI, rootpi, Rj, dTOr, mp, me, mpg, meg, charge
-
-  parameter(EMIS_SIZE=101)    !size of chianti emission tables
+  real    ::PI, rootpi, Rj, dTOr, mp, me, mpg, meg
+  parameter(EMIS_SIZE=101)    !size of chianti emmision tables
   parameter(CX_SIZE=17)       !charge exchange reactions
-  parameter(LAT_SIZE=31)      !latitudinal grid size
+  parameter(LAT_SIZE=21)      !latitudinal grid size
   parameter(REC_ROWS=81)      !Recombination table length
   parameter(REC_O=9)          !Number of O reaction in recombination_O.dat
   parameter(REC_S=3)          !Number of columns in recombination_S.dat
   parameter(PI=3.1415927)     ! PI
   parameter(rootpi=sqrt(PI))  !sqrt(pi) (reduces calculations)
-  parameter(Rj=71492.0)       !radius of Jupiter in km
-  parameter(Rjm=71492000.0)   !radius of Jupiter in m
-  parameter(dTOr=(PI/180.0))  !conversion from degree to radian
+  parameter(Rj=71492.0)       !radius of jupiter in km
+  parameter(dTOr=(2.0*PI/360.0))  !conversion from degree to radian
   parameter(mp=1.672621e-27)  !kg
   parameter(mpg=1.672621e-24) !grams 
   parameter(me=9.109381e-31)  !kg
   parameter(meg=9.109381e-28) !grams
-  parameter(charge=1.6e-19)   !elementary charge
-  parameter(omega=1.76e-4)    !angular velocity of Jupiter (rad/s)
   parameter(LNG_GRID=32)       !number of longitudinal slices of the torus
+!  parameter()      
 
 
 !! Make necessary structures to mimic Steffl Onebox model
@@ -83,7 +80,7 @@ MODULE varTypes
 
   TYPE:: energy
     real              ::s_ion=0.0, s_cx=0.0, o_ion=0.0, o_cx=0.0, elecHot_eq=0.0, tot_eq=0.0, P_in=0.0, Puv=0.0, Pfast=0.0 &
-                      , Ptrans=0.0, Ptrans_elecHot=0.0, P_out=0.0
+                      , Ptrans=0.0, Ptrans_elecHot=0.0, P_out=0.0 
   END TYPE
 
   TYPE :: reac
