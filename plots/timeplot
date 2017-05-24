@@ -1,0 +1,69 @@
+#!/bin/bash
+
+FILE='test'
+
+echo 'set terminal jpeg'                                      >$FILE
+#echo 'set logscale y'                                        >>$FILE
+echo 'set key below'                                         >>$FILE
+echo 'set size 1, 1'                                         >>$FILE
+echo "set xlabel 'System III Longitude'"                     >>$FILE
+echo "set ylabel 'Log Flux Tube Mixing Ratios'"              >>$FILE
+echo "set yrange [0:.3]"                                 >>$FILE
+echo "set xrange [0:360]"                                    >>$FILE
+echo "set xtics 45"                                          >>$FILE
+
+for i in $(seq 1 $1)
+do
+  
+  if [ "$i" -lt 10 ]
+  then   
+    echo "set title 'Temporal Variability of Flux Tube Content (000$i)'" >>$FILE
+    echo "set output 'gplot000$i.jpeg'" >> $FILE  
+  
+    echo "plot 'ftsp000$i.dat'  with lines title 'Sulfur + (II)'  , " '\' >> $FILE
+    echo "     'fts2p000$i.dat' with lines title 'Sulfur ++ (III)', " '\' >> $FILE
+    echo "     'fts3p000$i.dat' with lines title 'Sulfur +++ (IV)', " '\' >> $FILE
+    echo "     'ftop000$i.dat'  with lines title 'Oxygen + (II)'  , " '\' >> $FILE
+    echo "     'fto2p000$i.dat' with lines title 'Oxygen ++ (III)'  "     >> $FILE
+  else
+    if [ "$i" -lt 100 ] 
+    then
+      echo "set title 'Temporal Variability of Flux Tube Content (00$i)'" >>$FILE
+      echo "set output 'gplot00$i.jpeg'" >> $FILE  
+  
+      echo "plot 'ftsp00$i.dat'  with lines title 'Sulfur + (II)'  , " '\' >> $FILE
+      echo "     'fts2p00$i.dat' with lines title 'Sulfur ++ (III)', " '\' >> $FILE
+      echo "     'fts3p00$i.dat' with lines title 'Sulfur +++ (IV)', " '\' >> $FILE
+      echo "     'ftop00$i.dat'  with lines title 'Oxygen + (II)'  , " '\' >> $FILE
+      echo "     'fto2p00$i.dat' with lines title 'Oxygen ++ (III)'  "     >> $FILE
+    else
+      if [ "$i" -lt 1000 ] 
+      then
+        echo "set title 'Temporal Variability of Flux Tube Content (0$i)'" >>$FILE
+        echo "set output 'gplot0$i.jpeg'" >> $FILE  
+    
+        echo "plot 'ftsp0$i.dat'  with lines title 'Sulfur + (II)',   " '\' >> $FILE
+        echo "     'fts2p0$i.dat' with lines title 'Sulfur ++ (III)', " '\' >> $FILE
+        echo "     'fts3p0$i.dat' with lines title 'Sulfur +++ (IV)', " '\' >> $FILE
+        echo "     'ftop0$i.dat'  with lines title 'Oxygen + (II)',   " '\' >> $FILE
+        echo "     'fto2p0$i.dat' with lines title 'Oxygen ++ (III)'  "     >> $FILE
+      else
+        echo "set title 'Temporal Variability of Flux Tube Content ($i)'" >>$FILE
+        echo "set output 'gplot$i.jpeg'" >> $FILE  
+    
+        echo "plot 'ftsp$i.dat'  with lines title 'Sulfur + (II)',   " '\' >> $FILE
+        echo "     'fts2p$i.dat' with lines title 'Sulfur ++ (III)', " '\' >> $FILE
+        echo "     'fts3p$i.dat' with lines title 'Sulfur +++ (IV)', " '\' >> $FILE
+        echo "     'ftop$i.dat'  with lines title 'Oxygen + (II)',   " '\' >> $FILE
+        echo "     'fto2p$i.dat' with lines title 'Oxygen ++ (III)'  "     >> $FILE
+      fi
+    fi
+  fi
+
+
+done
+
+gnuplot $FILE
+
+convert -delay 15 gplot* animated.gif
+

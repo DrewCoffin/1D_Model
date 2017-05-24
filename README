@@ -1,0 +1,13 @@
+Program reminders/things to fix
+
+Make a readme and add lots of comments
+
+Rename module files appropriately. Condense and organize for easier navigation and understanding.
+
+for data files (tep*) temp and dens are removed and spaces are converted to newline using translate as such:
+	tr --squeeze " " '\n' < file >temporary       (then copy temporary to file after checking)
+
+Uses Upwind scheme to transport materials around the torus. The dispersion value (s) is modifiable in inputs.dat
+
+README FILE
+The script 'do' compiles the program, runs the executable, and plots the results. The program output is stored in 'runlog'. The 'profile' script produces a call tree with valgrind and opens it with kcachegrind. These are open source programs available in the ubuntu standard repositories. The program can be controlled through the 'input.dat' file. To compile the program without running, simply call 'make'. 

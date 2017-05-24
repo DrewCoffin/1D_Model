@@ -1,0 +1,15 @@
+2.0e28  #9.9e-4               source (/cm3*s)
+2.00                  o_to_s
+0.00235                fehot_const (fraction of electrons that are hot)
+62.0                  transport (days)
+55.0                  tehot hot electron temp in eV
+0.0                   lag_const subcorotational plasma speed in km/s (Refer to v_ion in ParallelVariables.f90)
+0.0                   neutral_amp
+50.0                  neutral_t0
+25.0                  neutral_width
+0.0                   hote_amp
+80.0                  hote_t0
+45.5                  hote_width
+300                   number of days for the run
+1                     number of outputs per day
+0.00                  s value for upwind scheme

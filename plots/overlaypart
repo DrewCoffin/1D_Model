@@ -1,0 +1,98 @@
+#!/bin/bash
+
+end=$( printf "%.0f" $2 )
+start=$( printf "%.0f" $1 )
+
+FILE='test'
+folder='data/intensity/'
+
+echo 'set terminal jpeg'                                      >$FILE
+echo 'set key off'                                           >>$FILE
+#echo 'set logscale y'                                       >>$FILE
+echo 'set size 1, 1'                                         >>$FILE
+echo "set xlabel 'System III Longitude'"                     >>$FILE
+echo "set ylabel 'Intenisty'"                                >>$FILE
+#echo "set yrange [0.5:1.5]"                                >>$FILE
+echo "set xrange [0:360]"                                    >>$FILE
+echo "set xtics 45"                                          >>$FILE
+echo "set title 'Flux Tube Emission intensity'"              >>$FILE
+echo "set output 'overlay.jpeg'" >> $FILE  
+
+first()
+{
+  if [ "$i" -lt 10 ]
+  then   
+    echo "plot   '"$folder"intensity000"$i".dat'  with lines,"  '\'  >> $FILE
+  else
+    if [ "$i" -lt 100 ] 
+    then
+      echo "plot   '"$folder"intensity00$i.dat'  with lines," '\'  >> $FILE
+    else
+      if [ "$i" -lt 1000 ] 
+      then
+        echo "plot   '"$folder"intensity0$i.dat'  with lines," '\' >> $FILE
+      else
+        echo "plot   '"$folder"intensity$i.dat'  with lines,"  '\' >> $FILE
+      fi
+    fi
+  fi
+}
+
+middle()
+{
+  if [ "$i" -lt 10 ]
+  then   
+    echo "   '"$folder"intensity000$i.dat'  with lines,"  '\'  >> $FILE
+  else
+    if [ "$i" -lt 100 ] 
+    then
+      echo "   '"$folder"intensity00$i.dat'  with lines," '\'  >> $FILE
+    else
+      if [ "$i" -lt 1000 ] 
+      then
+        echo "   '"$folder"intensity0$i.dat'  with lines," '\' >> $FILE
+      else
+        echo "   '"$folder"intensity$i.dat'  with lines,"  '\' >> $FILE
+      fi
+    fi
+  fi
+}
+  
+last()
+{
+  if [ "$i" -lt 10 ]
+  then   
+    echo "   '"$folder"intensity000$i.dat'  with lines"    >> $FILE
+  else
+    if [ "$i" -lt 100 ] 
+    then
+      echo "   '"$folder"intensity00$i.dat'  with lines"   >> $FILE
+    else
+      if [ "$i" -lt 1000 ] 
+      then
+        echo "   '"$folder"intensity0$i.dat'  with lines"  >> $FILE
+      else
+        echo "   '"$folder"intensity$i.dat'  with lines"   >> $FILE
+      fi
+    fi
+  fi
+}
+
+for i in $(seq $start $end)
+do
+  if [ "$i" -eq "$start" ]
+  then
+    first
+  else
+    if [ "$i" -eq "$end" ]
+    then
+      last
+    else
+      middle
+    fi
+  fi
+
+done
+
+gnuplot $FILE
+

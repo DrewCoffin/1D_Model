@@ -1,0 +1,60 @@
+set terminal jpeg
+set key off
+set size 1, 1
+set xlabel 'System III Longitude'
+set ylabel 'Intenisty'
+set xrange [0:360]
+set xtics 45
+set title 'Flux Tube Emission intensity'
+set output 'overlay.jpeg'
+plot 'intensity0000.dat'  with lines, \
+   'intensity0001.dat'  with lines, \
+   'intensity0002.dat'  with lines, \
+   'intensity0003.dat'  with lines, \
+   'intensity0004.dat'  with lines, \
+   'intensity0005.dat'  with lines, \
+   'intensity0006.dat'  with lines, \
+   'intensity0007.dat'  with lines, \
+   'intensity0008.dat'  with lines, \
+   'intensity0009.dat'  with lines, \
+   'intensity0010.dat'  with lines, \
+   'intensity0011.dat'  with lines, \
+   'intensity0012.dat'  with lines, \
+   'intensity0013.dat'  with lines, \
+   'intensity0014.dat'  with lines, \
+   'intensity0015.dat'  with lines, \
+   'intensity0016.dat'  with lines, \
+   'intensity0017.dat'  with lines, \
+   'intensity0018.dat'  with lines, \
+   'intensity0019.dat'  with lines, \
+   'intensity0020.dat'  with lines, \
+   'intensity0021.dat'  with lines, \
+   'intensity0022.dat'  with lines, \
+   'intensity0023.dat'  with lines, \
+   'intensity0024.dat'  with lines, \
+   'intensity0025.dat'  with lines, \
+   'intensity0026.dat'  with lines, \
+   'intensity0027.dat'  with lines, \
+   'intensity0028.dat'  with lines, \
+   'intensity0029.dat'  with lines, \
+   'intensity0030.dat'  with lines, \
+   'intensity0031.dat'  with lines, \
+   'intensity0032.dat'  with lines, \
+   'intensity0033.dat'  with lines, \
+   'intensity0034.dat'  with lines, \
+   'intensity0035.dat'  with lines, \
+   'intensity0036.dat'  with lines, \
+   'intensity0037.dat'  with lines, \
+   'intensity0038.dat'  with lines, \
+   'intensity0039.dat'  with lines, \
+   'intensity0040.dat'  with lines, \
+   'intensity0041.dat'  with lines, \
+   'intensity0042.dat'  with lines, \
+   'intensity0043.dat'  with lines, \
+   'intensity0044.dat'  with lines, \
+   'intensity0045.dat'  with lines, \
+   'intensity0046.dat'  with lines, \
+   'intensity0047.dat'  with lines, \
+   'intensity0048.dat'  with lines, \
+   'intensity0049.dat'  with lines, \
+   'intensity0050.dat'  with lines

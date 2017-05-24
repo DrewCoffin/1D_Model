@@ -1,0 +1,13 @@
+set terminal jpeg
+set key below
+set size 1, 1
+set ylabel 'Amplitude Ratio'
+set xlabel 'Time in Days'
+set yrange [0:1]
+set xrange [0:200]
+set xtics 25
+set ytics .2
+set title 'Peak Motion'
+set output 'peakRatio.jpeg'
+plot 'spPeakRatio.dat'  with lines title 'Sulfur + (II)'  ,  \
+     's3pPeakRatio.dat' with lines title 'Sulfur +++ (IV)'

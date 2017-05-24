@@ -1,0 +1,14 @@
+set terminal jpeg
+set logscale y
+set key below
+set size 1, 1
+set title 'Temporal Variability of Flux Tube Content'
+set xlabel 'Time in Days'
+set ylabel 'Log Flux Tube Mixing Ratios'
+set output 'gplot1.jpeg'
+plot 'ftsp001.dat'  with lines title "Sulfur + (II)",   \
+     'fts2p001.dat' with lines title "Sulfur ++ (III)", \
+     'fts3p001.dat' with lines title "Sulfur +++ (IV)", \
+     'ftop001.dat'  with lines title "Oxygen + (II)",   \
+     'fto2p001.dat' with lines title "Oxygen ++ (III)" 
+

@@ -1,0 +1,15 @@
+set terminal jpeg
+set key below
+set size 1, 1
+set ylabel 'System III Longitude'
+set xlabel 'Time in Days'
+set yrange [0:360]
+set xrange[0:300]
+set xtics 25
+set ytics 45
+set title 'Peak Motion'
+set output 'peaks.jpeg'
+plot 'spPeak.dat' title 'Sulfur + (II)'  ,  \
+     's3pPeak.dat' title 'Sulfur +++ (IV)' , \
+     'LoadPeak.dat' title 'Normalized Mass Loading',
+#plot 'LoadPeak.dat' title 'Normalized Mass Loading'  ,  
