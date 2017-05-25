@@ -107,7 +107,7 @@ subroutine model()
   zoff= abs(6.0* cos((lon3-longitude) * dTOr) * dTOr * rdist * Rj) !in km
   n_height = Rj/2.0
 
-  tm0=0.0
+  tm0=0.01 
 
 !set density values
   const=1800.0

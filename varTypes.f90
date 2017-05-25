@@ -5,7 +5,6 @@ MODULE varTypes
 
   integer :: EMIS_SIZE, CX_SIZE, LAT_SIZE, REC_ROWS, REC_O, REC_S, LNG_GRID
   real    ::PI, rootpi, Rj, dTOr, mp, me, mpg, meg, charge
-
   parameter(EMIS_SIZE=101)    !size of chianti emission tables
   parameter(CX_SIZE=17)       !charge exchange reactions
   parameter(LAT_SIZE=31)      !latitudinal grid size
@@ -15,14 +14,12 @@ MODULE varTypes
   parameter(PI=3.1415927)     ! PI
   parameter(rootpi=sqrt(PI))  !sqrt(pi) (reduces calculations)
   parameter(Rj=71492.0)       !radius of Jupiter in km
-  parameter(Rjm=71492000.0)   !radius of Jupiter in m
   parameter(dTOr=(PI/180.0))  !conversion from degree to radian
   parameter(mp=1.672621e-27)  !kg
   parameter(mpg=1.672621e-24) !grams 
   parameter(me=9.109381e-31)  !kg
   parameter(meg=9.109381e-28) !grams
   parameter(charge=1.6e-19)   !elementary charge
-  parameter(omega=1.76e-4)    !angular velocity of Jupiter (rad/s)
   parameter(LNG_GRID=32)       !number of longitudinal slices of the torus
 
 

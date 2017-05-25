@@ -1,5 +1,5 @@
-9.6e27                 source (/s) (divide by 1.37e31 to obtain per cc per s)
-1.70                  2.00_s
+9.64e27              source (/cm3*s)
+1.70                  o_to_s
 0.003                 fehot_const (fraction of electrons that are hot)
 50.0                  transport (days)
 40.0                  tehot hot electron temp in eV

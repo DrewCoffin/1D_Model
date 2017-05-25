@@ -9,9 +9,10 @@ def readval(sp, param):
    lval = llist.pop()
    return float(lval)
 
-colval = [0.1126, 240.44, 0.2110, 188.3, 0.0123, 160.08, 0.2962, 160.63, 0.0161, 142.53, 721.23]
+n_e = 721.23
+colval = [0.1126*n_e, 0.1126, 240.44, 0.2110*n_e, 0.2110, 188.3, 0.0123*n_e, 0.0123, 160.08, 0.2962*n_e, 0.2962, 160.63, 0.0161*n_e, 0.0161, 142.53, n_e]   
 sparr = ['sp', 's2p', 's3p', 'op', 'o2p']
-pararr = ['MIXR', 'TEMP']
+pararr = ['DENS', 'MIXR', 'TEMP']
 val = []
 
 for i in range(len(sparr)):
@@ -27,5 +28,7 @@ diff = [(val[2*k+1] - colval[k])/colval[k] for k in range(len(colval))]
 
 difflist = sum(zip(labels, diff), ())
 
+print("Table of values: ") 
 print(val)
+print("Percent difference from Colorado numbers: ")
 print(difflist)

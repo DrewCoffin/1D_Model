@@ -84,7 +84,7 @@ MODULE FUNCTIONS
     DOUBLE PRECISION  ::hi, hn
     REAL              ::a, b, c
     a = (hi*hi+hn*hn)/(hi*hi*hn*hn)
-    b = 2.0 * z0 / (hn * hn)
+    b = -2.0 * z0 / (hn * hn)
     c = (z0*z0)/(hn*hn)
     ion_neutral = sqrt(1.0/a) * exp((b*b - 4.0*a*c)/(4.0*a))
   END FUNCTION ion_neutral
@@ -172,8 +172,8 @@ MODULE FUNCTIONS
     ft_int1%cx(16) = rootpi * r_ind1%cx(16) * n1%o2p * n1%s2p  * s2p_o2p
     ft_int1%cx(17) = rootpi * r_ind1%cx(17) * n1%s3p * n1%sp   * sp_s3p
 
-    mass_loading=(32.0/(ROOTPI*h%s))*(ft_int1%cx(2) + ft_int1%cx(3) + ft_int1%cx(4) + ft_int1%cx(5) + ft_int1%cx(10) + ft_int1%cx(11) + ft_int1%cx(12)) &
-                +(16.0/(ROOTPI*h%o))*(ft_int1%cx(6) + ft_int1%cx(7) + ft_int1%cx(8) + ft_int1%cx(9) + ft_int1%cx(13) + ft_int1%cx(15))+ mass_loading
+!    mass_loading=(32.0/(ROOTPI*h%s))*(ft_int1%cx(2) + ft_int1%cx(3) + ft_int1%cx(4) + ft_int1%cx(5) + ft_int1%cx(10) + ft_int1%cx(11) + ft_int1%cx(12)) &
+!                +(16.0/(ROOTPI*h%o))*(ft_int1%cx(6) + ft_int1%cx(7) + ft_int1%cx(8) + ft_int1%cx(9) + ft_int1%cx(13) + ft_int1%cx(15))+ mass_loading
 
   END SUBROUTINE exchange_reactions
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!SPACER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -202,7 +202,7 @@ MODULE FUNCTIONS
     ft_int1%ioph  =  rootpi * r_ind1%ioph  * n1%op  * n1%elecHot * h1%op
     ft_int1%io2ph =  rootpi * r_ind1%io2ph * n1%o2p * n1%elecHot * h1%o2p
 
-    mass_loading=mass_loading  + (ft_int1%is+ft_int1%ish)*(32.0/(ROOTPI*h1%s)) + (ft_int1%io+ft_int1%ioh)*(16.0/(ROOTPI*h1%o))
+!    mass_loading=mass_loading  + (ft_int1%is+ft_int1%ish)*(32.0/(ROOTPI*h1%s)) + (ft_int1%io+ft_int1%ioh)*(16.0/(ROOTPI*h1%o))
 
   END SUBROUTINE impact_ionization
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!SPACER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -228,7 +228,7 @@ MODULE FUNCTIONS
     double precision      ::v, v_corot, omega, ms, mo, sc_const
 
     v_corot = 2.0 * PI * rdist * Rj / (9.925 *3600)
-    v = v_corot - v_ion + lag_amp * cos((lon3-lag_phase)*dTOr) !v_ion has been used instead of lag_const
+    v = v_corot - lag_const + lag_amp * cos((lon3-lag_phase)*dTOr) !v_ion has been used instead of lag_const
     omega = v/(rdist*Rj)
 
     ms = 32.0 * mp
@@ -236,12 +236,12 @@ MODULE FUNCTIONS
  
     sc_const = 1.6e-19
 
-    h%sp  = sqrt(2.0*T%sp *sc_const*(1.0+1.0 *T%elec/T%sp )/(3.0*ms))/(1000.0*omega)
-    h%s2p = sqrt(2.0*T%s2p *sc_const*(1.0+2.0 *T%elec/T%s2p )/(3.0*ms))/(1000.0*omega)
-    h%s3p = sqrt(2.0*T%s3p *sc_const*(1.0+3.0 *T%elec/T%s3p )/(3.0*ms))/(1000.0*omega)
+    h%sp  = sqrt(2.0*T%sp *sc_const*(1.0+1.0 *T%elec/T%sp )/(3.0*ms*omega**2))/(1000.0) !*omega)
+    h%s2p = sqrt(2.0*T%s2p *sc_const*(1.0+2.0 *T%elec/T%s2p )/(3.0*ms*omega**2))/(1000.0)
+    h%s3p = sqrt(2.0*T%s3p *sc_const*(1.0+3.0 *T%elec/T%s3p )/(3.0*ms*omega**2))/(1000.0)
 !    h%s4p = sqrt(2.0*T%s4p *sc_const*(1+4 *T%elec/T%s4p )/(3.0*ms))/(1000.0*omega)
-    h%op  = sqrt(2.0*T%op *sc_const*(1.0+1.0 *T%elec/T%op )/(3.0*mo))/(1000.0*omega)
-    h%o2p = sqrt(2.0*T%o2p *sc_const*(1.0+2.0 *T%elec/T%o2p )/(3.0*mo))/(1000.0*omega)
+    h%op  = sqrt(2.0*T%op *sc_const*(1.0+1.0 *T%elec/T%op )/(3.0*mo*omega**2))/(1000.0)
+    h%o2p = sqrt(2.0*T%o2p *sc_const*(1.0+2.0 *T%elec/T%o2p )/(3.0*mo*omega**2))/(1000.0)
 
   END SUBROUTINE get_scale_heights
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!SPACER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -350,8 +350,8 @@ MODULE FUNCTIONS
     call cfit(8,7, tkelv, ind%ioph)
     call cfit(8,6, tkelv, ind%io2ph)
 
-    !ind%cx=[1.2e-8,2.4e-8,3.0e-10,7.8e-9,1.32e-8,1.32e-8,5.2e-10   &
-    ind%cx=[8.1e-9,2.4e-8,3.0e-10,7.8e-9,1.32e-8,1.32e-8,5.2e-10   &
+    ind%cx=[1.2e-8,2.4e-8,3.0e-10,7.8e-9,1.32e-8,1.32e-8,5.2e-10   &
+    !ind%cx=[8.1e-9,2.4e-8,3.0e-10,7.8e-9,1.32e-8,1.32e-8,5.2e-10   &
            ,5.4e-9,6.0e-11,3.12e-9,2.34e-8,1.62e-8,2.28e-9,1.38e-9 &
            ,1.92e-8,9.0e-10,3.6e-10]
 
@@ -517,7 +517,7 @@ end function az_loss
 
     mp= 1.67262158e-27   !in kg
     
-    vrel= (1e3)*(12.57*L - (42.0/sqrt(L)))  !km/s
+    vrel= (1e3)*(12.57*L - (42.0/sqrt(L)))  !m/s
       
     Tpu=(m*mp*vrel*vrel)/(3.0*(1.60217646e-19))  !eV
 
@@ -527,7 +527,8 @@ end function az_loss
   real function lambda_ee(ne, Te)
     double precision  ::ne, Te
 !    real              ::ne, Te
-    lambda_ee = 23.5-.5*log(ne*sqrt(Te**(-5.0)))-sqrt((1.0e-5) + (((log(Te)-2.0)**2.0)/16.0))
+!    lambda_ee = 23.5-.5*log(ne*sqrt(Te**(-5.0)))-sqrt((1.0e-5) + (((log(Te)-2.0)**2.0)/16.0))
+    lambda_ee = 23.5-.5*log(sqrt(ne*Te**(-5.0/2.0)))-sqrt((1.0e-5) + (((log(Te)-2.0)**2.0)/16.0))
   end function lambda_ee
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!SPACER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !From NRL plasma formulary rev 2007 pg. 34
@@ -540,7 +541,7 @@ end function az_loss
      cond2=10.0*zi*zi
 
      if(cond1<Te .and. Te<cond2) then
-       lambda_ei= 23 - log(ne*zi*zi/(Te**3))/2   
+       lambda_ei= 23 - log(sqrt(ne)*zi*zi/(Te**3/2))   
 !       print *, "CASE: 1"  , "    Lambda:", lambda_ei
      elseif(cond1<cond2 .and. cond2<Te) then
        lambda_ei= 24 - log(sqrt(ne)/Te)     
@@ -550,7 +551,7 @@ end function az_loss
 !       print *, "CASE: 3"  , "    Lambda:", lambda_ei
      else
 !       print *, "Coulomb case not found: lambda_ei in functions.f90" !fix
-       lambda_ei= 23 - log(ne*zi*zi/(Te**3))/2  !default to first case
+       lambda_ei= 23 - log(sqrt(ne)*zi*zi/(Te**3/2))  !default to first case
      endif
 
   end function lambda_ei
@@ -887,7 +888,7 @@ end function az_loss
 
     ipTot= 2.0 * ipPer * n%elec /3.0
 
-    EF_elec= Teq - (2.0 * rad / 3.0)! - ipTot !- (v_r0/dr * n%elec * T%elec) 
+    EF_elec= Teq - (2.0 * rad / 3.0) - ipTot - (dep%transport * n%elec * T%elec) 
 
   end function EF_elec
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!SPACER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
