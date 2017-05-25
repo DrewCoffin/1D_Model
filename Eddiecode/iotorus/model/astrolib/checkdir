@@ -1,0 +1,10 @@
+
+if [ -d abc ]
+then
+echo Directory found
+else
+echo Directory not found
+mkdir abc
+fi
+
+( [ -d "tempsav" ] && echo "The directory exists" ) || echo "Does not exist"

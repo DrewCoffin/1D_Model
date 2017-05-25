@@ -1,0 +1,43 @@
+ 1  12.00  H
+ 2 10.925  He
+ 3   1.03  Li
+ 4   1.38  Be
+ 5   2.70  B
+ 6   8.50  C
+ 7   7.86 N
+ 8   8.76  O
+ 9   4.56  F
+10   8.05  Ne
+11   6.30  Na
+12   7.54  Mg
+13   6.47  Al
+14   7.52  Si
+15   5.46  P
+16   7.16  S
+17   5.50  Cl
+18   6.50  Ar
+19   5.11  K
+20   6.33  Ca
+21   3.10  Sc
+22   4.90  Ti
+23   4.00  V
+24   5.64  Cr
+25   5.37  Mn
+26   7.52  Fe
+27   4.92  Co
+28   6.23  Ni
+29   4.21  Cu
+30   4.62  Zn
+ -1
+%filename: sun_photospheric_caffau_2011.abund
+%created for the CHIANTI atomic database by Peter Young, 27-Jun-2012
+%abundance: Caffau, E., Ludwig, H.-G., Steffen, M., Freytag, B. & Bonifacio, P. 2011, Sol. Phys. 
+              268, 255  <bibcode="2011SoPh..268..255C">
+            Lodders, K., Palme, H., & Gail, H.P. 2009, Astronomy, Astrophysics, and Cosmology, B: 
+              Solar System, Landolt-Bornstein, New Series VI/4, Spring, Berlin, 560 
+              <bibcode="2009LanB...4B...44L">
+%comment:
+   Caffau et al. (2011) provided new abundances for 12 elements, 8 of which have Z<31. Caffau et al.
+   recommend combining these values with the abundances of Lodders et al. (2009), and so all other
+   abundances are from this paper.
+ -1

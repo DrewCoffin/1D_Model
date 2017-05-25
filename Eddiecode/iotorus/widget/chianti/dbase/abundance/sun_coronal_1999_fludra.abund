@@ -1,0 +1,28 @@
+ 1  12.00  H 
+ 2  10.80  He
+ 6   8.41  C
+ 7   7.81  N
+ 8   8.74  O
+10   7.95  Ne
+11   6.63  Na
+12   7.90  Mg
+13   6.80  Al
+14   7.87  Si
+15   5.44  P
+16   7.32  S
+17   5.08  Cl
+18   6.36  Ar
+19   5.46  K
+20   6.66  Ca
+22   5.25  Ti
+24   6.00  Cr
+26   7.83  Fe
+28   6.56  Ni
+30   4.09  Zn
+ -1
+%filename: sun_coronal_fludra_1999.abund
+%elemental abundances: Fludra, A. & Schmelz, J. T., 1999, A&A, 348, 286
+% produced for the CHIANTI atomic database by Enrico Landi, Jun 2002
+%comment:
+    Filename changed, Peter Young 27-Jun-2012 (previous name: sun_hybrid.abund)
+ -1

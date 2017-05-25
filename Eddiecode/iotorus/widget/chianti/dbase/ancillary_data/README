@@ -1,0 +1,25 @@
+
+This directory contains additional data that might be useful 
+when running CHIANTI routines.
+
+
+Last update Giulio Del Zanna 2-May-2002
+
+
+instrument_responses/
+
+contains the effective areas of many instruments, 
+as simple ascii files with two columns, 
+wavelengths in Ansgtroms and effective areas (cm-2)
+These files have been created from the analogous 
+files from PIMMS (Portable, Interactive, Multi-Mission Simulator)
+ version 3.2c .See 
+
+http://heasarc.gsfc.nasa.gov/docs/software/tools/pimms.html
+
+for more information.
+
+
+
+
+

@@ -1,0 +1,154 @@
+; $Id: //depot/idl/IDL_71/idldir/lib/parse_url.pro#1 $
+;
+; Copyright (c) 2006-2009, ITT Visual Information Solutions. All
+;       rights reserved. Unauthorized reproduction is prohibited.
+;+
+; NAME:
+;   Parse_Url
+;
+; PURPOSE:
+;   This utility function can be used to break a URL into it's
+;   individual componets.
+;
+;   This function returns a structure containing the individual components
+;   of the url that can be used to set the corresponding properties on the
+;   IDLnetUrl, IDLnetOgcWms and IDLnetOgcWcs objects.
+
+;   URL Components:
+;   URL_SCHEME://URL_USERNAME:URL_PASSWORD@URL_HOST:URL_PORT/URL_PATH?URL_QUERY
+;
+;   Example url:
+;   http://me:mypw@host.com:8080/project/data/get_data.cgi?dataset=climate&date=01012006
+;
+; CATEGORY:
+;   URL
+;
+; CALLING SEQUENCE:
+;   Result = Parse_Url(url)
+;
+; INPUTS:
+;   URL: A string containing a url
+;
+; KEYWORDS:
+;   None
+;
+; OUTPUTS:
+;   This function returns a structure containing the URL components.  The
+;   returned structure has the following elements
+;           Scheme
+;           Username
+;           Password
+;           Host
+;           Port
+;           Path
+;           Query
+;
+; SIDE EFFECTS:
+;   None.
+;
+; RESTRICTIONS:
+;   None.
+;
+; PROCEDURE:
+;
+; EXAMPLE CALLING SEQUENCE:
+;   url_struc = Parse_Url(url)
+;
+; MODIFICATION HISTORY:
+;   Jan 2007 - Initial Version
+;   26-jul-2011 - S.L.Freeland - do/remove QUERY 1st, since "special characters" intefere with original logic
+;                                (for example, '@' is allowable JSOC query charcter which clobbered username logic)
+;-
+
+function Parse_Url, url
+
+  compile_opt idl2
+  on_error, 2                   ; return errors to caller
+
+  ; create the return structure that will contain the url components
+  xUrlProps = create_struct(    'Scheme',     '', $
+                                'Username',   '', $
+                                'Password',   '', $
+                                'Host',       '', $
+                                'Port',       '80', $
+                                'Path',       '', $
+                                'Query',      '')
+
+  ; get len of passed in url string and if 0 exit
+  iUrlLen = strlen(url)
+  if (iUrlLen eq 0) then begin
+     return, xUrlProps
+  endif
+
+  ; find the begining of the host component
+  ; if a '://' was not found then exit because this is not a complete url
+  iPos = strpos(url, '://')
+  if (iPos eq -1) then begin
+     return, xUrlProps
+  endif
+
+  ; stor the scheme in the return structure
+  xUrlProps.Scheme = strmid(url, 0, iPos)
+
+  ; move past the '://'
+  iPos = iPos + 3
+
+
+;  Do/remove QUERY first to allow free form queries
+  
+  query='' ; init to No Query
+  if strpos(url,'?') ne -1 then query=ssw_strsplit(url,'?',/tail, head=url) ; divide URL/QUERY
+  url=url[0]
+  query=query[0]
+
+  ; extract a username and password if they are presnt
+  iPosAt = strpos(url, '@', iPos)
+  if (iPosAt ne -1) then begin
+     iPosPass = strpos(url, ':', iPos)
+     if ((iPosPass ne -1) && (iPosPass lt iPosAt)) then begin
+         iLen = iPosAt - (iPosPass + 1)
+         ; store the password component in the return structure
+         xUrlProps.Password = strmid(url, iPosPass+1, iLen)
+     endif else begin
+         iPosPass = iPosAt
+     endelse
+     iLen = iPosPass - iPos
+     ; store the username component in the return structure
+     xUrlProps.username = strmid(url, iPos, iLen)
+     iPos = iPosAt + 1
+  endif
+
+  ; find the start of the path if the url has a path
+  iPosPath = strpos(url, '/', iPos)
+  if (iPosPath eq -1) then begin
+     iPosPath = iUrlLen
+  endif
+
+  iHostEnd = iPosPath
+
+  ; extract port number if present
+  iPosPort = strpos(url, ':', iPos)
+  if (iPosPort ne -1) then begin
+     iLen = iPosPath - (iPosPort + 1)
+     ; store the port component in the return structure
+     xUrlProps.Port = strmid(url, iPosPort+1, iLen)
+     iHostEnd = iPosPath - iLen -1
+  endif
+
+  ; store the host component in the return structure
+  iLen = iHostEnd - iPos
+  xUrlProps.Host = strmid(url, iPos, iLen)
+
+  ; store the path component in the return structure
+  xUrlProps.Path = strmid(url, iPosPath+1, strlen(url))
+
+  ; store the query component in the return structure
+  xUrlProps.Query = query 
+  if query ne '' then url=url+'?'+query 
+
+  ; return the url components in a structure
+  return, xUrlProps
+
+end
+
+

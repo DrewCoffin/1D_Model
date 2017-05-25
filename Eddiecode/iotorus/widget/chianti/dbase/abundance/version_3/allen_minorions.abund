@@ -1,0 +1,22 @@
+ 1   12.00     H   
+ 9     4.60    F   
+11     6.25    Na
+13     6.39    Al 
+15     5.52    P  
+17     5.6     Cl
+19     4.95    K  
+21     3.22    Sc
+22     5.13    Ti
+23     4.40    V  
+24     5.85    Cr
+25     5.40    Mn
+27     5.1     Co
+29     4.5     Cu
+30     4.2     Zn
+-1
+%file:  allen.abund
+%elemental abundances:  C. W. Allen, 1973, Astrophysical Quantities
+  only the minor ions are included in this list.  it is mainly for testing purposes.
+%prepared as part of the Arcetri/Cambridge/NRL atomic data collaboration CHIANTI
+-1
+

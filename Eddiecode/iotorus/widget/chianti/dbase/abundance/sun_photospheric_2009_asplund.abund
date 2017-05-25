@@ -1,0 +1,35 @@
+ 1  12.00  H
+ 2  10.93  He
+ 3   1.05  Li
+ 4   1.38  Be
+ 5   2.70  B
+ 6   8.43  C
+ 7   7.83  N
+ 8   8.69  O
+ 9   4.56  F
+10   7.93  Ne
+11   6.24  Na
+12   7.60  Mg
+13   6.45  Al
+14   7.51  Si
+15   5.41  P
+16   7.12  S
+17   5.50  Cl
+18   6.40  Ar
+19   5.03  K
+20   6.34  Ca
+21   3.15  Sc
+22   4.95  Ti
+23   3.93  V
+24   5.64  Cr
+25   5.43  Mn
+26   7.50  Fe
+27   4.99  Co
+28   6.22  Ni
+29   4.19  Cu
+30   4.56  Zn
+ -1
+%filename: sun_photospheric_2009_asplund.abund
+%created for the CHIANTI atomic database by Peter Young, 27-Jun-2012
+%abundance: Asplund, M., Grevesse, N., Sauval, A.J., & Scott, P. 2009, ARAA, 47, 481
+ -1
