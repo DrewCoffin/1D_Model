@@ -6,9 +6,8 @@ Pro runmodel
   ; = sqrt(pi)*.5*RJcm
   
   tot2cms = sqrt(!dpi)*0.5*!rjkm*1e5
-
   ; create structure to hold all input parameters
-  input = create_struct( 'source', 7.20-4*tot2cms, $ ; [# cm^-3 s^-1]
+  input = create_struct( 'source', 7.20e-4*tot2cms, $ ; [# cm^-3 s^-1]
                          'o_to_s',     1.7    , $ ; ratio
                     'fehot_const',     0.003  , $ ; fraction of hot e
                       'transport',    50.0     , $ ; [days]
@@ -22,6 +21,8 @@ Pro runmodel
                         'hote_t0',     0.0     , $ ; hot e fraction perturb, inital time [DOY 2000]
                      'hote_width',     0.0       ) ; width of hot e fraction perturb [days]
   
+  ;print,tot2cms
+  ;print, tot2cms*!rjkm^2*1e10
   ; structure containing energy values
   energy = {energy, s_ion: 0.0, s_cx: 0.0, o_ion: 0.0, o_cx: 0.0, eh_eq: 0.0, tot_eq: 0.0, P_in: 0.0, $
             Puv: 0.0, Pfast: 0.0, Ptrans: 0.0, Ptrans_eh: 0.0, P_out: 0.0}
@@ -33,7 +34,7 @@ Pro runmodel
                      /plot, /printiter, $
                      tm   = 0.01, $
                      ;runt = 500., $ latest dataset
-                     runt = 200., $
+                     runt = 1., $
                      /Nosave, $
                      ;filename = '_dim10_5-5', $
                      source = input.source, o_to_s = input.o_to_s, fehot_const = input.fehot_const, $
@@ -41,7 +42,7 @@ Pro runmodel
                      neutral_amp = input.neutral_amp, neutral_t0 = input.neutral_t0, neutral_width = input.neutral_width, $
                      hote_amp = input.hote_amp, hote_t0 = input.hote_t0, hote_width = input.hote_width, $
                      lag_amp = 0, lag_phase = 0., $
-                     protons = 0.16, n_height = 0.5*!rjkm
+                     protons = 0.1, n_height = 0.5*!rjkm
   stop = systime(/julian)
   mrun = (stop - start)*84600d
 
@@ -100,5 +101,3 @@ Pro runmodel
   print
   print,'% Runtime of: ' + string(mrun)  + ' seconds'
   print
-  
-  End

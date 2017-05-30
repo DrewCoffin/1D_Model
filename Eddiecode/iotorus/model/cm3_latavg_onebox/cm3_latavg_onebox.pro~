@@ -28,30 +28,29 @@ runtime=systime(1)
 getsysvariables
 
 model_dir = 'model/cm3_latavg_onebox/'
-fname = '/home/dcoffin/1D_Model/Eddiecode/iotorus/model/cm3_latavg_onebox/theta.dat'
-openw,21,fname
+
 IF NOT keyword_set(filename) THEN filename = '_output'
 
 tepdir = model_dir
 !p.multi=[0,1,1]
 
 ; Open new window(s) if needed to plot the results
-;;IF keyword_set(plot) THEN BEGIN
-  ;; loadct,39
-  ;; device, decomposed = 0
-  ;; oldwinid=!d.window
- 
+IF keyword_set(plot) THEN BEGIN
+   loadct,39
+   device, decomposed = 0
+   oldwinid=!d.window
+
    ;restore, file = model_dir + 'avgmixratios.sav'
 
-  ;; IF NOT keyword_set(xwinsize) THEN xwinsize = 640
- ;;  IF NOT keyword_set(ywinsize) THEN ywinsize = 512
+   IF NOT keyword_set(xwinsize) THEN xwinsize = 640
+   IF NOT keyword_set(ywinsize) THEN ywinsize = 512
 
-;;   window, /free, /pixmap, xs = xwinsize, ys = ywinsize
-;;   comp_pixmap_id = !d.window
-;;   window, /free, xs = xwinsize, ys = ywinsize
-;;   comp_window_id = !d.window
+   window, /free, /pixmap, xs = xwinsize, ys = ywinsize
+   comp_pixmap_id = !d.window
+   window, /free, xs = xwinsize, ys = ywinsize
+   comp_window_id = !d.window
 
-;;ENDIF
+ENDIF
 
 ; The plasma is not corotating with magnetic field
 if n_elements(lag_const1) gt 0 then lag_const=lag_const1 else lag_const=3.0 ; km/s
@@ -65,59 +64,35 @@ if keyword_set(trans_type1) then trans_type=1 else trans_type=0
 
 ; Model time step in seconds (slightly longer than the time for
 ; neutrals to cross a 15 degree azimuthal bin)
-dt = 750.     
-printf, 21, FORMAT = '("dt: ",I0)', dt ;;;;;
+dt = 7.5e2 ;2e3     
 
 if n_elements(runt1) EQ 0 THEN runt = 220.*8.64e4 ELSE runt=runt1*8.64e4; Total run time
-printf,21,FORMAT = '("runt: ",I0)', runt ;;;;;
-
 nit = fix(runt/dt)+1     ; Number of iterations
-printf,21,FORMAT = '("nit: ",I0)', nit ;;;;;
+
 
 ; Radial distance of model, default is 6 R_J
 IF keyword_set(rdist1) THEN rdist = rdist1 ELSE rdist = 6.
-
-printf,21,FORMAT = '("rdist: ",I0)', rdist ;;;;; 
 
 ; System III longitude of box
 if keyword_set(lon) then l3 = lon ELSE l3 = 110.
 lontemp = l3
 
-printf,21,FORMAT = '("lontemp: ",I0)', lontemp ;;;;;
-
 ; Neutral Cloud scale height in km
 theta_offset = 6.4 * cos((l3 - 200.) * !dtor) * !dtor
-
-printf,21,FORMAT = '("theta_offset: ",I0)', theta_offset
-
 zoff = abs(theta_offset * rdist * 71492.) ; in km, not cm! Always positive
-
-printf,21,FORMAT = '("zoff: ",I0)', zoff ;;;;;
-
 IF NOT keyword_set(n_height) THEN n_height = 0.5 * 71492.
 
-printf,21,FORMAT = '("n_height: ",I0)', n_height ;;;;;
+
 ; N.B. the tag "el" refers to the thermal electron population only. Similarly,
 ; "elh" is only for the hot electron population.
 n = {dens_lon,sp:0.0d,s2p:0.0d, s3p: 0.0d, s4p: 0.0d, op: 0.0d, $
   o2p: 0.0d, el: 0.0d, elh: 0.0d, s: 0.0d, o: 0.0d, fc:0d, fh:0d, protons:0d}
-
-printf,21,FORMAT = '("n: ",I0)', n ;;;;;
-
 nT = {energy_lon, sp: 0.0d, s2p: 0.0d, s3p: 0.0d, s4p: 0.0d, op: 0.0d, $
                  o2p: 0.0d, el: 0.0d, elh: 0.0d}
-
-printf,21,FORMAT = '("nT: ",I0)', nT ;;;;;
-
 T = {temp_lon,sp: 0.0d, s2p: 0.0d, s3p: 0.0d, s4p: 0.0d,  $
                 op: 0.0d, o2p: 0.0d, el: 0.0d, elh: 0.0d, pu_s: 0d, pu_o: 0d}
-
-printf,21,FORMAT = '("T: ",I0)', T ;;;;;
-
 h = {scale_heights_lon, s: 0.0, sp: 0.0, s2p: 0.0, s3p: 0.0, s4p:0.0, $
                 o: 0.0, op: 0.0, o2p: 0.0, el: 0.0}
-
-printf,21,FORMAT = '("h: ",I0)', h ;;;;;
 
 ; Structures used to store intermediate values in the Euler advance subroutine
 n1=n
@@ -135,8 +110,6 @@ nu = {nu, sp_s2p:0d, sp_s3p:0d, sp_s4p:0d, sp_op:0d, sp_o2p:0d, s2p_s3p:0d, $
       s4p_op: 0d, s4p_o2p:0d, op_o2p:0d, sp_el:0d, s2p_el:0d, s3p_el:0d, s4p_el:0d,$
       op_el:0d, o2p_el:0d, sp_elh:0d, s2p_elh:0d, s3p_elh:0d, s4p_elh:0d,$
       op_elh:0d, o2p_elh:0d, el_elh: 0d}
-
-printf,21,FORMAT = '("nu: ",I0)', nu ;;;;;
 
 ; structure containing energy values
 ;; energy = {energy, s_ion: 0.0, s_cx: 0.0, o_ion: 0.0, o_cx: 0.0, eh_eq: 0.0, tot_eq: 0.0, P_in: 0.0, $
@@ -170,16 +143,12 @@ r_ind = {independent_rates,ish:0.0,isph:0.0,is2ph:0.0,is3ph:0.0,ioh:0.0,ioph:0.0
 r_dep = {dependent_rates, is: 0.0, isp: 0.0, is2p: 0.0, is3p: 0.0, $
   io: 0.0, iop:0.0, io2p: 0.0, rsp: 0.0, rs2p: 0.0, rs3p: 0.0, rop: 0.0, ro2p:0.0,$
   Transport:0.0}
-
-printf,21,FORMAT = '("r_dep: ",I0)', r_dep ;;;;;
 r1_dep=r_dep
 
 ; Latitudinal Density structure
 lat_dist = {lat_dist, z:dindgen(21)/5. * 71492., sp:dblarr(21), s2p:dblarr(21), $
              s3p:dblarr(21), s4p:dblarr(21), op:dblarr(21), o2p:dblarr(21), $
              el:dblarr(21)}
-
-printf,21,FORMAT = '("lat_dist: ",I0)', lat_dist ;;;;;
 lat_dist1 = lat_dist
 
 ; flux tube integrated number of reactions per second.
@@ -189,27 +158,15 @@ ftint = {ftint, cx_k0:0d, cx_k1:0d, cx_k2:0d, cx_k3:0d, cx_k4:0d, cx_k5:0d, $
                   is3p:0d, io:0d, iop:0d, io2p:0d, ish:0d, isph:0d, is2ph:0d, is3ph:0d, $
                   ioh:0d, ioph:0d, io2ph:0d, rsp:0d, rs2p:0d, rs3p:0d, rop:0d, ro2p:0d}
 
-printf,21,FORMAT = '("ftint: ",I0)', ftint ;;;;;
-
 ; Output quantites, that will contain the values of density and
 ; temperature in every longitudinal box at every time step
 n_out=n
-
-printf,21,FORMAT = '("n_out: ",I0)', n_out ;;;;;
-
 t_out=t
-
-printf,21,FORMAT = '("t_out: ",I0)', t_out ;;;;;
-
 h_out=h
-
-printf,21,FORMAT = '("h_out: ",I0)', h_out ;;;;;
 
 ; Initialize time, phase, and amplitude variables
 IF n_elements(tm1) EQ 0 THEN tm = 170. ELSE tm = tm1
 tm0=tm
-
-printf,21,FORMAT = '("tm: ",I0)', tm ;;;;;
 
 ; Is this a continuation of a previous run?
 if keyword_set(contfile) then begin
@@ -234,20 +191,10 @@ if keyword_set(contfile) then begin
     h_out=h
     if size(trans_out,/type) eq 0 then trans_out=trans else $
       trans_out=trans_out[n_out_dim[1]-1]
-
-    printf,21,FORMAT = '("trans_out: ",I0)', trans_out ;;;;;
-
     o2s_out = otos
 
-    printf,21,FORMAT = '("o2s_out: ",I0)', o2s_out ;;;;;
-
     source_out=source_out[n_out_dim[1]-1]
-
-    printf,21,FORMAT = '("source_out: ",I0)', source_out ;;;;;
-
     net_source = source_out
-
-    printf,21,FORMAT = '("net_source: ",I0)', net_source ;;;;;
 
 ; Start At DOY 170, which is June 18, in a leap year (as 2000 was)
     IF n_elements(tm1) EQ 0 THEN tm = 170. ELSE tm = tm1
@@ -255,46 +202,29 @@ if keyword_set(contfile) then begin
 endif else begin
 
    n.sp=  0.060 * 1800.
-   printf,21,FORMAT = '("n.sp: ",I0)', n.sp ;;;;;
    n.s2p= 0.212 * 1800.
-   printf,21,FORMAT = '("n.s2p: ",I0)', n.s2p ;;;;;
    n.s3p= 0.034 * 1800.
-   printf,21,FORMAT = '("n.s3p: ",I0)', n.s3p ;;;;;
    n.op=  0.242 * 1800.
-   printf,21,FORMAT = '("n.op: ",I0)', n.op ;;;;;
    n.o2p= 0.123 * n.op 
-   printf,21,FORMAT = '("n.o2p: ",I0)', n.o2p ;;;;;
 
    n.s=25.
-   printf,21,FORMAT = '("n.s: ",I0)', n.s ;;;;;
    n.o=50.
-   printf,21,FORMAT = '("n.o: ",I0)', n.o ;;;;;
 
 ; January Latavg Conditions
     Te0 = 5.0d
-    printf,21,FORMAT = '("Te0: ",I0)', Te0 ;;;;;
     Ti0 = 70.0d
-    printf,21,FORMAT = '("Ti0: ",I0)', Ti0 ;;;;;
     Teh0 = 49.0d
-    printf,21,FORMAT = '("Teh0: ",I0)', Teh0 ;;;;;
     fehot_const = 0.0022d
-    printf,21,FORMAT = '("fehot_const: ",I0)', fehot_const ;;;;;
     trans = 1.0d/(70.28*8.64e4)
-    printf,21,FORMAT = '("trans: ",I0)', trans ;;;;;
 ; with a 0.5 Rj scale height for neutrals, this comes out to 9.9e-4 cm-3 s-1
 ; at the equator
     net_source = 6.3e6
-    printf,21,FORMAT = '("net_source: ",I0)', net_source ;;;;;
     otos = 1.7d
-    printf,21,FORMAT = '("otos: ",I0)', otos ;;;;;
 
 ; Total electron density
     n.el = (n.sp + 2 * n.s2p + 3 * n.s3p + 4 * n.s4p + n.op + 2 * n.o2p) * (1.-n.protons)
-    printf,21,FORMAT = '("n.el: ",I0)', n.el ;;;;;
     n.elh = n.fh/(1.-n.fh) * n.el               ; Hot electron density
-    printf,21,FORMAT = '("n.elh: ",I0)', n.elh ;;;;;
     n.fc = 1.-n.fh
-    printf,21,FORMAT = '("n.fc: ",I0)', n.fc ;;;;;
 
 ; Assign Temp values
     T[*].sp = Ti0
@@ -324,7 +254,6 @@ endif else begin
 ; constant. Default is not to include protons
 IF keyword_set(protons) THEN BEGIN
     n.protons  = protons
-    printf,21,FORMAT = '("n.protons: ",I0)', n.protons ;;;;;
     n1.protons = protons
     np.protons = protons
  ENDIF
@@ -341,30 +270,19 @@ r_ind.o2s_spike = o2s_spike
 
 ; Initialize time variable neutral source and hot electron fraction parameters
 tau0=1./trans/8.64e4
-printf,21,FORMAT = '("tau0: ",I0)', tau0 ;;;;;
 net_source0 = net_source
-printf,21,FORMAT = '("net_source0: ",I0)', net_source0 ;;;;;
 fh0 = fehot_const
-printf,21,FORMAT = '("fh0: ",I0)', fh0 ;;;;;
 
 if not keyword_set(neutral_amp) then neutral_amp=0.
-printf,21,FORMAT = '("neutral_amp: ",I0)', neutral_amp ;;;;;
 if not keyword_set(neutral_t0) then neutral_t0=249. ; 5-Sept-2000 as per Delamere et al 2004
-printf,21,FORMAT = '("neutral_t0: ",I0)', neutral_t0 ;;;;;
 if not keyword_set(neutral_width) then neutral_width=25.0
-printf,21,FORMAT = '("neutral_width: ",I0)', neutral_width ;;;;;
 
 if not keyword_set(hote_amp) then hote_amp=0.0000
-printf,21,FORMAT = '("hote_amp: ",I0)', hote_amp ;;;;;
 if not keyword_set(hote_t0) then hote_t0= 269.
-printf,21,FORMAT = '("hote_t0: ",I0)', hote_t0 ;;;;;
 if not keyword_set(hote_width) then hote_width=45.5
-printf,21,FORMAT = '("hote_width: ",I0)', hote_width ;;;;;
 IF keyword_set(n_height) THEN BEGIN 
    h.s = n_height
-   printf,21,FORMAT = '("h.s: ",I0)', h.s ;;;;;
    h.o = n_height
-   printf,21,FORMAT = '("h.0: ",I0)', h.o ;;;;;
 ENDIF
 
 ; Read in total emitted power arrays.
@@ -377,42 +295,26 @@ read_emission_tables, tepdir + 'tepOIII_v7.0.2',temp,den,emisO2p
 ; Store info into r_ind structure. These fields should not get modified by
 ; any other subroutine
 r_ind.emistemp = temp
-;rintf,21,FORMAT = '("r_ind.emistemp: ",I0)', r_ind.emistemp ;;;;;
 r_ind.emisden  = den
-;rintf,21,FORMAT = '("r_ind.emisden: ",I0)', r_ind.emisden ;;;;;
 r_ind.emisSp   = emisSp
-;rintf,21,FORMAT = '("r_ind.emisSp: ",I0)', r_ind.emisSp ;;;;;
 r_ind.emisS2p  = emisS2p
-;printf,21,FORMAT = '("r_ind.emisS2p: ",I0)', r_ind.emisS2p ;;;;;
 r_ind.emisS3p  = emisS3p
-;rintf,21,FORMAT = '("r_ind.emisS3p: ",I0)', r_ind.emisS3p ;;;;;
 r_ind.emisOp   = emisOp
-;rintf,21,FORMAT = '("r_ind.emisOp: ",I0)', r_ind.emisOp ;;;;;
 r_ind.emisO2p  = emisO2p
-;rintf,21,FORMAT = '("r_ind.emisO2p: ",I0)', r_ind.emisO2p ;;;;;
 
 ;set initial pickup temperatures
 Lshl = rdist
 T.pu_s = Tpu(32.,Lshl)
-printf,21,FORMAT = '("T.pu_s: ",I0)', T.pu_s ;;;;;
 T.pu_o = Tpu(16.,Lshl)
-printf,21,FORMAT = '("T.pu_o: ",I0)', T.pu_o ;;;;;
 T.elh = Teh0
-printf,21,FORMAT = '("T.elh: ",I0)', T.elh ;;;;;
 
 T1.pu_s = T.pu_s
-printf,21,FORMAT = '("T1.pu_s: ",I0)', T1.pu_s ;;;;;
 T1.pu_o = T.pu_o
-printf,21,FORMAT = '("T1.pu_o: ",I0)', T1.pu_o ;;;;;
 T1.elh = Teh0
-printf,21,FORMAT = '("T1.elh: ",I0)', T1.elh ;;;;;
 
 Tp.pu_s = T.pu_s
-printf,21,FORMAT = '("Tp.pu_s: ",I0)', Tp.pu_s ;;;;;
 Tp.pu_o = T.pu_o
-printf,21,FORMAT = '("Tp.pu_o: ",I0)', Tp.pu_o ;;;;;
 Tp.elh = Teh0
-printf,21,FORMAT = '("Tp.elh: ",I0)', Tp.elh ;;;;;
 
 ; Call get_independent_rates to get the reaction rates for charge
 ; exchange, hot electron ionization, and neutral source production. As
@@ -420,50 +322,33 @@ printf,21,FORMAT = '("Tp.elh: ",I0)', Tp.elh ;;;;;
 get_independent_rates,r_ind,T,h
 
 net_source0 = net_source
-
 iondens0 = avg(n.sp + n.s2p + n.s3p + n.s4p + n.op + n.o2p)
 
-printf,21,FORMAT = '("iondens0: ",I0)', iondens0 ;;;;;
 ; Angular velocity (rad/sec) for circular orbit about Jupiter at rdist
 ;omega_neutrals = 1./sqrt((rdist * !rjkm * 1e3)^3/(6.673e-11 * 1.8987e27))
 rdistkm = rdist*!rjkm
-printf,21,FORMAT = '("rdistkm: ",I0)', rdistkm ;;;;;
 omega_neutrals = 1./sqrt( (1e9)*(rdistkm*rdistkm*rdistkm) /(6.673e-11 * 1.8987e27))
-printf,21,FORMAT = '("omega_neutrals: ",I0)', omega_neutrals ;;;;;
 v_neutrals = omega_neutrals * rdistkm ; km/s
-printf,21,FORMAT = '("v_neutrals: ",I0)', v_neutrals ;;;;;
 v_corotation = 2. * !pi * rdistkm / (9.925 * 3600.) ; km/s
-printf,21,FORMAT = '("v_corotation: ",I0)', v_corotation ;;;;;
 rel_v_neutrals = v_corotation - v_neutrals
-printf,21,FORMAT = '("rel_v_neutrals: ",I0)', rel_v_neutrals ;;;;;
 
 ; Final consistency checks
 ; Check that the sum of the thermal & hot electron fractions equals one
 n.fc = 1. - n.fh
-printf,21,FORMAT = '("n.fc: ",I0)', n.fc ;;;;;
 
 ;  Ensure charge neutrality in the thermal electron population. We
 ;  assume that the hot electrons are linked to a separate hot proton population.
 n.el = (n.sp + 2.*n.s2p + 3.*n.s3p + 4.*n.s4p + n.op + 2.*n.o2p)/(1.-n.protons)
-printf,21,FORMAT = '("n.el: ",I0)', n.el ;;;;;
 n.elh = n.fh/(1.-n.fh) * n.el
-printf,21,FORMAT = '("n.elh: ",I0)', n.elh ;;;;;
 
 nT.el  = n.el  * T.el
-printf,21,FORMAT = '("nT.el: ",I0)', nT.el ;;;;;
 nT.elh  = n.elh * T.elh
-printf,21,FORMAT = '("nT.elh: ",I0)', nT.elh ;;;;;
 nT.sp  = n.sp  * T.sp
-printf,21,FORMAT = '("nT.sp: ",I0)', nT.sp ;;;;;
 nT.s2p = n.s2p * T.s2p
-printf,21,FORMAT = '("nT.s2p: ",I0)', nT.s2p ;;;;;
 nT.s3p = n.s3p * T.s3p
-printf,21,FORMAT = '("nT.s3p: ",I0)', nT.s3p ;;;;;
 ;nT.s4p = n.s4p * T.s4p
 nT.op  = n.op  * T.op
-printf,21,FORMAT = '("nT.op: ",I0)', nT.op ;;;;;
 nT.o2p = n.o2p * T.o2p
-printf,21,FORMAT = '("nT.o2p: ",I0)', nT.o2p ;;;;;
 
 n1=n
 nT1=nT
@@ -492,20 +377,20 @@ for j=0,nit-1 do begin
    endif
 
    time = tm0 + j * dt / 86400.
-   printf,21,FORMAT = '("time: ",I0)', time ;;;;;
+
 ; Time variable neutral source
    net_source = net_source0*(1. + neutral_amp*exp(-(time-neutral_t0)^2/neutral_width^2))
-   printf,21,FORMAT = '("net_source: ",I0)', net_source ;;;;;
+
 ; Let the neutral source be the sum of two independent sources: a
 ; baseline source with an O/S of o_to_s and a Gaussian increase with a
 ; potentially different O/S of o2s_spike
    r_ind.o_to_s = (otos + $
                    o2s_spike * neutral_amp*exp(-(time-neutral_t0)^2/neutral_width^2))/$
                   (1+neutral_amp*exp(-(time-neutral_t0)^2/neutral_width^2))
-  ;printf,21,FORMAT = '("r_ind.o_to_s: ",I0)', r_ind.o_to_s ;;;;;
+
 ; Time variable hot electron fraction
    n.fh = fehot_const * (1. + hote_amp * exp(-(time - hote_t0)^2 / hote_width^2))
-   printf,21,FORMAT = '("n.fh: ",I0)', n.fh ;;;;;
+
    
    negative_fh = where(n.fh LT 0, nbadfh)
    IF nbadfh GT 0 THEN BEGIN
@@ -522,9 +407,7 @@ for j=0,nit-1 do begin
 
 ; Update the hot electron densities
    n.elh = n.fh/(1.-n.fh) * n.el ; ** could be re-written n.fh/n.fc **
-   printf,21,FORMAT = '("n.elh: ",I0)', n.elh ;;;;;
    nT.elh  = n.elh * T.elh
-   printf,21,FORMAT = '("nT.elh: ",I0)', nT.elh ;;;;;
 
 ; Call cm3_latavg_model to advance the model one time step
    cm3_latavg_model, n,  T,  nT,  h,  nu,  $
@@ -565,23 +448,18 @@ for j=0,nit-1 do begin
       tm = [tm,time]
       
       ftmix=ftint_mix(n,h)
-      printf,21,FORMAT = '("ftmix: ",I0)', ftmix ;;;;;
       n_out = n
       t_out = t
       h_out = h
       f_out = ftmix
       trans_out=[trans_out,avg(r_dep.transport)]
-      printf,21,FORMAT = '("trans_out: ",I0)', trans_out ;;;;;
       o2s_out = [o2s_out, r_ind.o_to_s]
-      printf,21,FORMAT = '("o2s_out: ",I0)', o2s_out ;;;;;
       source_out = [source_out, net_source]
-      printf,21,FORMAT = '("source_out: ",I0)', source_out ;;;;;
 
       energy_budget, n, h, T, r_dep, r_ind, ftint, lat_dist, nu, energy
       P_IO = (energy.P_in + energy.tot_eq)/(energy.P_out - energy.tot_eq)
-      printf,21,FORMAT = '("P_IO: ",I0)', P_IO ;;;;;
+
       spr = ftmix.s2p/ftmix.s3p
-      printf,21,FORMAT = '("spr: ",I0)', spr ;;;;;
      
       ;if j EQ 0 then ftmix_out = [ftmix, ftmix] else ftmix_out=[ftmix_out, ftmix]
 
@@ -589,27 +467,26 @@ for j=0,nit-1 do begin
         ; initialize plot
         ;loadct, 39
         ;device, decomposed = 0
-   ;;     plot, [tm,runt1+tm], [0.001,1.0], /nodata, $
-;;              ytitle = 'ft int ratio', xtitle = 'time [doy]', /xstyle, $ ;, ystyle = 8, $
-;;              xmargin = [8, 8], ymargin = [4, 4], charsize = 1.25, /ylog
- ;;       xyouts, .15, .95, /normal,  'sp', col =  57, charsize = 1.25
- ;;       xyouts, .20, .95, /normal, 's2p', col = 147, charsize = 1.25
- ;;       xyouts, .25, .95, /normal, 's3p', col = 210, charsize = 1.25
- ;;       xyouts, .30, .95, /normal,  'op', col = 254, charsize = 1.25
-  ;;      xyouts, .35, .95, /normal, 'o2p', col = 100, charsize = 1.25
- ;;       xyouts, .40, .95, /normal, 'd/dt s2p/s3p', col = 180, charsize = 1.25
+        plot, [tm,runt1+tm], [0.001,1.0], /nodata, $
+              ytitle = 'ft int ratio', xtitle = 'time [doy]', /xstyle, $ ;, ystyle = 8, $
+              xmargin = [8, 8], ymargin = [4, 4], charsize = 1.25, /ylog
+        xyouts, .15, .95, /normal,  'sp', col =  57, charsize = 1.25
+        xyouts, .20, .95, /normal, 's2p', col = 147, charsize = 1.25
+        xyouts, .25, .95, /normal, 's3p', col = 210, charsize = 1.25
+        xyouts, .30, .95, /normal,  'op', col = 254, charsize = 1.25
+        xyouts, .35, .95, /normal, 'o2p', col = 100, charsize = 1.25
+        xyouts, .40, .95, /normal, 'd/dt s2p/s3p', col = 180, charsize = 1.25
         dspr = 1 ; initialize dspr for break check
       endif else begin
         dspr = abs((spr_old - spr)/.01)
-        printf,21,FORMAT = '("dspr: ",I0)', dspr ;;;;;
         ;print, dspr
 
- ;;       oplot, [time], [ftmix.sp ], col =  57, psym = 3
- ;;       oplot, [time], [ftmix.s2p], col = 147, psym = 3
- ;;       oplot, [time], [ftmix.s3p], col = 210, psym = 3
- ;;       oplot, [time], [ftmix.op ], col = 254, psym = 3
- ;;       oplot, [time], [ftmix.o2p], col = 100, psym = 3
- ;;       oplot, [time], [     dspr], col = 180, psym = 3
+        oplot, [time], [ftmix.sp ], col =  57, psym = 3
+        oplot, [time], [ftmix.s2p], col = 147, psym = 3
+        oplot, [time], [ftmix.s3p], col = 210, psym = 3
+        oplot, [time], [ftmix.op ], col = 254, psym = 3
+        oplot, [time], [ftmix.o2p], col = 100, psym = 3
+        oplot, [time], [     dspr], col = 180, psym = 3
       endelse
 
       spr_old = spr
@@ -663,7 +540,7 @@ IF keyword_set(plot) THEN BEGIN
 ENDIF
 
 getsysvariables,/restore
-close, 21
+
 ;if keyword_set(printiter) then print,'Runtime of: '+strtrim(systime(1)-runtime,2)+' seconds'
 
 end

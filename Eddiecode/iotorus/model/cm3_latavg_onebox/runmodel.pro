@@ -6,11 +6,11 @@ Pro runmodel
   tot2cms = sqrt(!dpi)*0.5*!rjkm*1e5
 
   ; create structure to hold all input parameters
-  input = create_struct( 'source',17.2e-4*tot2cms, $ ; [# cm^-3 s^-1]
+  input = create_struct( 'source',7.2e-4*tot2cms, $ ; [# cm^-3 s^-1]
                          'o_to_s',     1.7    , $ ; ratio
-                    'fehot_const',     0.23   , $ ; fraction of hot e
-                      'transport',    27.0     , $ ; [days]
-                          'tehot',    80.0     , $ ; [ev]
+                    'fehot_const',     0.003  , $ ; fraction of hot e
+                      'transport',    50.0     , $ ; [days]
+                          'tehot',    40.0     , $ ; [ev]
   ; note: the following perturbation parameters aren't used by widget
                       'lag_const',     0.0     , $ ; [km/s] subcorotational plasma speed
                     'neutral_amp',     0.0     , $ ; neutral perturb, amplitude

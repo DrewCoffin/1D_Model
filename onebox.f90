@@ -83,8 +83,8 @@ subroutine model()
   trans_type=.false.
 
 !set dt (2000)
-  dt=750.0
-!  source = source *2000.0/dt
+  dt=750.0 
+! source = source *2000.0/dt
 
 !set run time
   runt=run_days*8.64e4 !one day = 86400 seconds
@@ -104,7 +104,7 @@ subroutine model()
   lon3=200
 
 !set zoff
-  zoff= abs(6.0* cos((lon3-longitude) * dTOr) * dTOr * rdist * Rj) !in km
+  zoff= abs(6.4* cos((lon3-longitude) * dTOr) * dTOr * rdist * Rj) !in km
   n_height = Rj/2.0
 
   tm0=0.01 
@@ -118,20 +118,20 @@ subroutine model()
     test_multiplier=1.0+0.2*cos(2.0*longitude*dTOr)
   endif
 
-!  n%sp = 0.060 * const * test_multiplier* (rdist/6.0)**(-8.0)
-!  n%s2p= 0.212 * const * test_multiplier* (rdist/6.0)**(-8.0)
-!  n%s3p= 0.034 * const * test_multiplier* (rdist/6.0)**(-3.0)
-!  n%op = 0.242 * const * test_multiplier* (rdist/6.0)**(-8.0)
-!  n%o2p= 0.242 * const * test_multiplier* (rdist/6.0)**(-3.0)
+  n%sp = 0.060 * const * test_multiplier!* (rdist/6.0)**(-8.0)
+  n%s2p= 0.212 * const * test_multiplier!* (rdist/6.0)**(-8.0)
+  n%s3p= 0.034 * const * test_multiplier!* (rdist/6.0)**(-3.0)
+  n%op = 0.242 * const * test_multiplier!* (rdist/6.0)**(-8.0)
+  n%o2p= 0.242 * const * test_multiplier!* (rdist/6.0)**(-3.0)
 
-  n%sp = 150.0 * test_multiplier
-  n%s2p= 600.0 * test_multiplier
-  n%s3p=  100.0 * test_multiplier
-  n%op = 400.0 * test_multiplier
-  n%o2p=  40.0 * test_multiplier
+!  n%sp = 150.0 * test_multiplier
+!  n%s2p= 600.0 * test_multiplier
+!  n%s3p=  100.0 * test_multiplier
+!  n%op = 400.0 * test_multiplier
+!  n%o2p=  40.0 * test_multiplier
 
-  n%s=50.0 * test_multiplier
-  n%o=100.0 * test_multiplier
+  n%s=25.0 * test_multiplier
+  n%o=50.0 * test_multiplier
 
 
   Te0 = 5.0
@@ -139,9 +139,9 @@ subroutine model()
   Teh0= tehot
   if(Teh0 .gt. 400.0) Teh0=400.0
   n%fh=fehot_const
-  trans = 4.62963e-7
+  trans = 1.646851e-7 !4.62963e-7
   net_source=source/volume
-
+  print *, net_source
   n%elec = (n%sp + n%op + 2 * (n%s2p + n%o2p) + 3 * n%s3p) * (1.0 - n%protons)
   n%elecHot = n%fh * n%elec / (1.0-n%fh)
 
@@ -168,6 +168,7 @@ subroutine model()
   ind%o2s_spike=2.0
 
   tau0=transport !1.0/(trans*8.64e4)
+  print *, tau0
   net_source0=net_source 
   !fh0 = fehot_const
 
@@ -361,7 +362,7 @@ subroutine model()
         file_num = file_num + 1
     endif        
  
-    call Grid_transport(n, nrg)
+    !call Grid_transport(n, nrg)
 !    isNaN=NaNcatch(n%sp, 100, mype) !fix
     Io_loc = mod(Io_loc+(dt*v_Io), torus_circumference)  
     sys4_loc = mod(sys4_loc+(dt*v_sys4), torus_circumference)  

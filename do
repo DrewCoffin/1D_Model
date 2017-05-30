@@ -1,6 +1,6 @@
 #!/bin/bash
 
-npes=32
+npes=1 
 days=200
 
 ./changeDimension.sh $npes
@@ -26,12 +26,12 @@ if [ $? -eq 0 ]
 
     cd plots
 
-      ./plotifyWload $days DENS
-      mv animated.avi ../dens.avi
-      ./plotify $days MIXR
-      mv animated.avi ../mixr.avi
-      ./plotify $days TEMP	
-      mv animated.avi ../temp.avi
+#      ./plotifyWload $days DENS
+#      mv animated.avi ../dens.avi
+#      ./plotify $days MIXR
+#      mv animated.avi ../mixr.avi
+#      ./plotify $days TEMP	
+#      mv animated.avi ../temp.avi
 #      ./plotify $days INTS
 #      mv animated.avi ../intensity.avi
 #      ./overlay $days 
@@ -69,6 +69,8 @@ if [ $? -eq 0 ]
 fi
 
 make clean
+
+python colo.py
 
 #gifview -a dens.gif &
 #mplayer -loop -0 dens.avi &

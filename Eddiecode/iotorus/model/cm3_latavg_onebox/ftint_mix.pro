@@ -14,12 +14,12 @@ mix.fc = n.fc
 mix.fh = n.fh
 
 sqrtpi = sqrt(!pi)
-N_sp  = n.sp ;*sqrtpi*h.sp
-N_s2p = n.s2p;*sqrtpi*h.s2p
-N_s3p = n.s3p;*sqrtpi*h.s3p
-N_s4p = n.s4p;*sqrtpi*h.s4p
-N_op  = n.op ;*sqrtpi*h.op
-N_o2p = n.o2p;*sqrtpi*h.o2p
+N_sp  = n.sp *sqrtpi*h.sp
+N_s2p = n.s2p*sqrtpi*h.s2p
+N_s3p = n.s3p*sqrtpi*h.s3p
+N_s4p = n.s4p*sqrtpi*h.s4p
+N_op  = n.op *sqrtpi*h.op
+N_o2p = n.o2p*sqrtpi*h.o2p
 
 ;protons = n.protons
 nel_tot=(n_sp+2*n_s2p+3*n_s3p+4*n_s4p+n_op+2*n_o2p)/(1.-n.protons)

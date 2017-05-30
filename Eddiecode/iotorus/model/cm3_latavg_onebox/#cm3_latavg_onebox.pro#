@@ -179,7 +179,7 @@ lat_dist = {lat_dist, z:dindgen(21)/5. * 71492., sp:dblarr(21), s2p:dblarr(21), 
              s3p:dblarr(21), s4p:dblarr(21), op:dblarr(21), o2p:dblarr(21), $
              el:dblarr(21)}
 
-printf,21,FORMAT = '("lat_dist: ",I0)', lat_dist ;;;;;
+;printf,21,FORMAT = '("lat_dist: ",I0)', lat_dist ;;;;;
 lat_dist1 = lat_dist
 
 ; flux tube integrated number of reactions per second.

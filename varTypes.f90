@@ -9,7 +9,7 @@ MODULE varTypes
   parameter(CX_SIZE=17)       !charge exchange reactions
   parameter(LAT_SIZE=31)      !latitudinal grid size
   parameter(REC_ROWS=81)      !Recombination table length
-  parameter(REC_O=9)          !Number of O reaction in recombination_O.dat
+  parameter(REC_O=9)          !Number of O reactions in recombination_O.dat
   parameter(REC_S=3)          !Number of columns in recombination_S.dat
   parameter(PI=3.1415927)     ! PI
   parameter(rootpi=sqrt(PI))  !sqrt(pi) (reduces calculations)
