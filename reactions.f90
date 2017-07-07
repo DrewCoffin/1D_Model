@@ -1,4 +1,4 @@
-! Keep common reaction variables here    
+!! Keep common reatcion variables here    
 MODULE REACTIONS
 
   real           ::s_sp, s_s2p, s_s3p, s_op, s_o2p

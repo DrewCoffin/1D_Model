@@ -24,15 +24,14 @@ MODULE DEBUG
   logical             ::OUTPUT_DENS = .true. !Variable to control outputs for plotting
   logical             ::OUTPUT_TEMP = .true. !Variable to control outputs for plotting
   logical             ::OUTPUT_INTS = .not. .true. !Variable to control outputs for plotting
-                                  ! true means plot, false means silence outputs
+                                   ! true means plot, false means silence outputs
   logical             ::moving_Io = .not. .true. !turns the motion of Io on and off 
   logical             ::test_pattern = .not. .true. !allows for testing azimuthal source patterns
-  logical             ::UseLaxWendroff = .true. !Uses Lax Wendroffd scheme to handle azimuthal transport (fast, less diffusive))
-  logical             ::Upwind = .not. .true. !Uses upwind scheme to handle azimuthal transport (fast, diffusive)
+  logical             ::Upwind = .not. .true. !Uses upwind scheme to handle transport (fast)
   logical             ::Euler  = .not. .true. !Uses Improved euler method to determine transport (slow)
-  logical             ::sys3hot  = .true. !creates a hot electron population that is stationary in sys3
-  logical             ::sys4hot  = .not. .true. !creates a hot electron population that is mobile in sys3
-
+  logical             ::UseLaxWendroff = .true. !Uses upwind scheme to handle transport (fast)
+  logical             ::sys3hot  = .true. !creates a hot electron population that is sationary in sys3
+  logical             ::sys4hot  = .not. .true. !creates a hot electron population that is sationary in sys3
 
   CONTAINS
 
@@ -315,23 +314,5 @@ MODULE DEBUG
     v%elec_elecHot  =a
 
   end subroutine initNu
-
-  subroutine singleout(nl2,nl2e, mype)
-    type(density)     ::n, nl2, nl2e
-!    type(temp)        ::t
-    integer           ::mype
-
-    if(mype .eq. 0) then
-!      print *, "DENSITY"
-!      call output(n)
-      print *, "NL2"
-      call output(nl2)
-      print *, "NL2E"
-      call output(nl2e)
-!      print *, "TEMP"
-!      call output(t)
-    end if
-
-  end subroutine singleout
 
 end MODULE DEBUG

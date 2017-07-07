@@ -21,11 +21,11 @@ MODULE FUNCTIONS
     type(r_dep)    ::r_dep2
     type(r_ind)    ::r_ind2
     type(ft_int)   ::ft_int2
-    real           ::zoff
+    real zoff
 
-    mass_loading=0.0
+    mass_loading =0.0
     mass_loading2=0.0
-    
+
     call ion_neutral_reactions(h2, zoff)
     call ion_ion_reactions(h2)
     call electron_neutral_reactions(n2)
@@ -84,7 +84,7 @@ MODULE FUNCTIONS
     DOUBLE PRECISION  ::hi, hn
     REAL              ::a, b, c
     a = (hi*hi+hn*hn)/(hi*hi*hn*hn)
-    b = -2.0 * z0 / (hn * hn)
+    b = -2 * z0 / (hn * hn)
     c = (z0*z0)/(hn*hn)
     ion_neutral = sqrt(1.0/a) * exp((b*b - 4.0*a*c)/(4.0*a))
   END FUNCTION ion_neutral
@@ -149,9 +149,9 @@ MODULE FUNCTIONS
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!SPACER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   SUBROUTINE exchange_reactions(ft_int1, r_ind1, n1, h)
     type(ft_int)   :: ft_int1
-    type(r_ind)   :: r_ind1
+    type(r_ind)    :: r_ind1
     type(density)  :: n1
-    type(height)   ::h
+    type(height)   :: h
     integer        :: i
 
     ft_int1%cx(1)  = rootpi * r_ind1%cx(1)  * n1%sp  * n1%s2p  * sp_s2p
@@ -172,8 +172,8 @@ MODULE FUNCTIONS
     ft_int1%cx(16) = rootpi * r_ind1%cx(16) * n1%o2p * n1%s2p  * s2p_o2p
     ft_int1%cx(17) = rootpi * r_ind1%cx(17) * n1%s3p * n1%sp   * sp_s3p
 
-!    mass_loading=(32.0/(ROOTPI*h%s))*(ft_int1%cx(2) + ft_int1%cx(3) + ft_int1%cx(4) + ft_int1%cx(5) + ft_int1%cx(10) + ft_int1%cx(11) + ft_int1%cx(12)) &
-!                +(16.0/(ROOTPI*h%o))*(ft_int1%cx(6) + ft_int1%cx(7) + ft_int1%cx(8) + ft_int1%cx(9) + ft_int1%cx(13) + ft_int1%cx(15))+ mass_loading
+    mass_loading=(32.0/(ROOTPI*h%s))*(ft_int1%cx(2) + ft_int1%cx(3) + ft_int1%cx(4) + ft_int1%cx(5) + ft_int1%cx(10) + ft_int1%cx(11) + ft_int1%cx(12)) &
+                +(16.0/(ROOTPI*h%o))*(ft_int1%cx(6) + ft_int1%cx(7) + ft_int1%cx(8) + ft_int1%cx(9) + ft_int1%cx(13) + ft_int1%cx(15))+ mass_loading
 
   END SUBROUTINE exchange_reactions
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!SPACER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -202,7 +202,7 @@ MODULE FUNCTIONS
     ft_int1%ioph  =  rootpi * r_ind1%ioph  * n1%op  * n1%elecHot * h1%op
     ft_int1%io2ph =  rootpi * r_ind1%io2ph * n1%o2p * n1%elecHot * h1%o2p
 
-!    mass_loading=mass_loading  + (ft_int1%is+ft_int1%ish)*(32.0/(ROOTPI*h1%s)) + (ft_int1%io+ft_int1%ioh)*(16.0/(ROOTPI*h1%o))
+    mass_loading=mass_loading  + (ft_int1%is+ft_int1%ish)*(32.0/(ROOTPI*h1%s)) + (ft_int1%io+ft_int1%ioh)*(16.0/(ROOTPI*h1%o))
 
   END SUBROUTINE impact_ionization
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!SPACER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -228,20 +228,20 @@ MODULE FUNCTIONS
     double precision      ::v, v_corot, omega, ms, mo, sc_const
 
     v_corot = 2.0 * PI * rdist * Rj / (9.925 *3600)
-    v = v_corot - lag_const + lag_amp * cos((lon3-lag_phase)*dTOr) !v_ion has been used instead of lag_const
+    v = v_corot - v_ion + lag_amp * cos((lon3-lag_phase)*dTOr) !v_ion has been used instead of lag_const
     omega = v/(rdist*Rj)
-
     ms = 32.0 * mp
     mo = 16.0 * mp
  
     sc_const = 1.6e-19
 
-    h%sp  = sqrt(2.0*T%sp *sc_const*(1.0+1.0 *T%elec/T%sp )/(3.0*ms*omega**2))/(1000.0) !*omega)
-    h%s2p = sqrt(2.0*T%s2p *sc_const*(1.0+2.0 *T%elec/T%s2p )/(3.0*ms*omega**2))/(1000.0)
-    h%s3p = sqrt(2.0*T%s3p *sc_const*(1.0+3.0 *T%elec/T%s3p )/(3.0*ms*omega**2))/(1000.0)
+    h%sp  = sqrt(2.0*T%sp *sc_const*(1+1 *T%elec/T%sp )/(3.0*ms*omega**2))/(1000.0)
+    h%s2p = sqrt(2.0*T%s2p *sc_const*(1+2 *T%elec/T%s2p )/(3.0*ms*omega**2))/(1000.0)
+    h%s3p = sqrt(2.0*T%s3p *sc_const*(1+3 *T%elec/T%s3p )/(3.0*ms*omega**2))/(1000.0)
 !    h%s4p = sqrt(2.0*T%s4p *sc_const*(1+4 *T%elec/T%s4p )/(3.0*ms))/(1000.0*omega)
-    h%op  = sqrt(2.0*T%op *sc_const*(1.0+1.0 *T%elec/T%op )/(3.0*mo*omega**2))/(1000.0)
-    h%o2p = sqrt(2.0*T%o2p *sc_const*(1.0+2.0 *T%elec/T%o2p )/(3.0*mo*omega**2))/(1000.0)
+    h%op  = sqrt(2.0*T%op *sc_const*(1+1 *T%elec/T%op )/(3.0*mo*omega**2))/(1000.0)
+    print *, "T%op, T%elec = ", T%op, T%elec
+    h%o2p = sqrt(2.0*T%o2p *sc_const*(1+2 *T%elec/T%o2p )/(3.0*mo*omega**2))/(1000.0)
 
   END SUBROUTINE get_scale_heights
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!SPACER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -259,9 +259,10 @@ MODULE FUNCTIONS
       lat%op(i)  = n%op *exp(-(lat%z(i)/h%op)**2)
       lat%o2p(i) = n%o2p *exp(-(lat%z(i)/h%o2p)**2)
 
-      lat%elec(i) = lat%sp(i) + lat%op(i) + 2.0*(lat%s2p(i)+lat%o2p(i)) + 3.0*lat%s3p(i)! + 4*lat%s4p(i) !fix s4pa
+      lat%elec(i) = lat%sp(i) + lat%op(i) + 2*(lat%s2p(i)+lat%o2p(i)) + 3*lat%s3p(i)! + 4*lat%s4p(i) !fix s4p
     end do
 
+!    call lat_print(lat%z)
 
   END SUBROUTINE lat_distribution 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!SPACER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -276,7 +277,6 @@ MODULE FUNCTIONS
   END SUBROUTINE lat_print
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!SPACER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   SUBROUTINE dependent_rates(dep, ind, n, T, h)
-!    USE INPUTS
     type(r_dep)       ::dep
     type(r_ind)       ::ind
     type(density)     ::n
@@ -294,6 +294,8 @@ MODULE FUNCTIONS
     kTOev= 8.617385e-05
     tkelv = T%elec/kTOev
     logtemp = log10(tkelv)
+
+!    print *, T%elec, tkelv, logtemp
 
     call cfit(16,16, tkelv, dep%is)   
     call cfit(16,15, tkelv, dep%isp)   
@@ -326,11 +328,10 @@ MODULE FUNCTIONS
     tau = tau0 * (net_source0/net_source)**trans_exp
     
     dep%transport = 1.0/(tau*86400.0)
-
-    ind%S_production = frac_s*net_source!/(ROOTPI*h%s*(1e5))
-
-    ind%O_production = frac_o*net_source!/(ROOTPI*h%o*(1e5))
-
+    
+    ind%S_production = frac_s*net_source/(ROOTPI*h%s*(1e5))
+    ind%O_production = frac_o*net_source/(ROOTPI*h%o*(1e5))
+    
   END SUBROUTINE dependent_rates
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!SPACER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   SUBROUTINE independent_rates(ind, T, h)
@@ -351,7 +352,6 @@ MODULE FUNCTIONS
     call cfit(8,6, tkelv, ind%io2ph)
 
     ind%cx=[1.2e-8,2.4e-8,3.0e-10,7.8e-9,1.32e-8,1.32e-8,5.2e-10   &
-    !ind%cx=[8.1e-9,2.4e-8,3.0e-10,7.8e-9,1.32e-8,1.32e-8,5.2e-10   &
            ,5.4e-9,6.0e-11,3.12e-9,2.34e-8,1.62e-8,2.28e-9,1.38e-9 &
            ,1.92e-8,9.0e-10,3.6e-10]
 
@@ -367,6 +367,8 @@ double precision function az_loss(v, val)
   call MPI_SEND(az_loss, 1, MPI_DOUBLE_PRECISION, mod(mype+1, npes), 22, MPI_COMM_WORLD, ierr)
   call MPI_RECV(source, 1, MPI_DOUBLE_PRECISION, mod(mype-1, npes), 22, MPI_COMM_WORLD, stat, ierr)
 
+!  print *, mygrid, az_loss, source
+
   az_loss = az_loss - source
 
 end function az_loss
@@ -381,7 +383,7 @@ end function az_loss
     real              ::s,l !source and loss
     
     s = ind%S_production
-!    print *, "should be ~10^-4", ind%S_production
+
     l = (ft%is + ft%ish) 
     do i=2, 5
       l=l+ft%cx(i)
@@ -390,10 +392,11 @@ end function az_loss
     do i=10, 12
       l=l+ft%cx(i)
     end do
-
-    !if( Euler ) l=l+az_loss(v_neutral,n%s)
+!    if( Euler ) l=l+az_loss(v_neutral,n%s)
     l=l/(ROOTPI*h%s)
-    mass_loading2=l+mass_loading2
+
+    mass_loading2=mass_loading2+l
+
     F_s = s-l
 
   end function F_s
@@ -408,30 +411,9 @@ end function az_loss
     s= ft%is + ft%ish + ft%rs2p + (ft%cx(3) + ft%cx(3)) + ft%cx(5) &
      + ft%cx(10) + ft%cx(11) + ft%cx(13)
     l= ft%isp + ft%isph + ft%rsp + ft%cx(9) + ft%cx(14) + ft%cx(17) 
-    
-!    if( mype .eq. 0 ) then
-!      print *, "SOURCES S+"
-!      print *, "Sulfur Impact ionization      : ", ft%is/s
-!      print *, "Sulfur Impact ionization(hot) : ", ft%ish/s
-!      print *, "Sulfur ++ Recombination       : ", ft%rs2p/s
-!      print *, "Charge Exchange #3            : ", 2.0*ft%cx(3)/s
-!      print *, "Charge Exchange #5            : ", ft%cx(5)/s
-!      print *, "Charge Exchange #10           : ", ft%cx(10)/s
-!      print *, "Charge Exchange #11           : ", ft%cx(11)/s
-!      print *, "Charge Exchange #13           : ", ft%cx(13)/s
-!      print *, "LOSSES S+"
-!      print *, "Sulfur Plus Impact ionization      : ", ft%isp/l
-!      print *, "Sulfur Plus Impact ionization(hot) : ", ft%isph/l
-!      print *, "Sulfur Plus Recombination          : ", ft%rsp/l
-!      print *, "Charge Exchange #9                 : ", ft%cx(9)/l
-!      print *, "Charge Exchange #14                : ", ft%cx(14)/l
-!      print *, "Charge Exchange #17                : ", ft%cx(17)/l
-!    end if
+!    if( Euler ) l=l+az_loss(v_ion,n%sp)
 
-    F_sp=(s-l)/(ROOTPI*h%sp) - n%sp * dep%transport
-!    if ( mype .eq. 1 .or. mype .eq. 6 .or. mype .eq. 7 ) then
-!      print *, "SOURCE ::: ", s, ":::LOSS:::", l, ft%cx(3) , mype
-!    endif
+    F_sp=(s-l)/(ROOTPI*h%sp) - n%sp * dep%transport 
 
   end function F_sp
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!SPACER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -445,6 +427,8 @@ end function az_loss
     s= ft%isp + ft%isph + ft%rs3p +ft%cx(5) + ft%cx(12) + ft%cx(14) &
      + ft%cx(15) + ft%cx(17) + ft%cx(17)
     l= ft%is2p + ft%is2ph + ft%rs2p + ft%cx(3) + ft%cx(13) + ft%cx(16)
+!    if( Euler ) l=l+az_loss(v_ion,n%s2p)
+
     F_s2p=(s-l)/(ROOTPI*h%s2p) - n%s2p * dep%transport
 
   end function F_s2p
@@ -476,6 +460,7 @@ end function az_loss
     l= ft%io + ft%ioh + ft%cx(6) + ft%cx(7) + ft%cx(8) + ft%cx(9) &
      + ft%cx(13) + ft%cx(15) 
     l= l/(ROOTPI*h%o)
+!    if( Euler ) l=l+az_loss(v_neutral,n%o)
     mass_loading2=mass_loading2+l
     F_o= (s-l)
 
@@ -492,8 +477,9 @@ end function az_loss
      + ft%cx(9) + ft%cx(11) + ft%cx(12) + ft%cx(13) + ft%cx(14)    &
      + ft%cx(15) + ft%cx(16)
     l= ft%iop +ft%ioph + ft%rop + ft%cx(10) 
+!    if( Euler ) l=l+az_loss(v_ion,n%op)
 
-    F_op= (s-l)/(ROOTPI*h%op) - n%op * dep%transport
+    F_op= (s-l)/(ROOTPI*h%op) - n%op*dep%transport
 
   end function F_op
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!SPACER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -507,8 +493,9 @@ end function az_loss
     s= ft%iop + ft%ioph
     l= ft%io2p + ft%io2ph + ft%ro2p + ft%cx(7) + ft%cx(11)  &
      + ft%cx(12) + ft%cx(14) + ft%cx(16)
+!    if( Euler ) l=l+az_loss(v_ion,n%o2p)
 
-    F_o2p= (s-l)/(ROOTPI*h%o2p) - n%o2p * dep%transport
+    F_o2p= (s-l)/(ROOTPI*h%o2p)-n%o2p*dep%transport
 
   end function F_o2p
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!SPACER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -517,9 +504,9 @@ end function az_loss
 
     mp= 1.67262158e-27   !in kg
     
-    vrel= (1e3)*(12.57*L - (42.0/sqrt(L)))  !m/s
+    vrel= (1e3)*(12.57*L - (42/sqrt(L)))  !km/s
       
-    Tpu=(m*mp*vrel*vrel)/(3.0*(1.60217646e-19))  !eV
+    Tpu= (m*mp*vrel*vrel)/(3*(1.60217646e-19))  !eV
 
   end function Tpu
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!SPACER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -527,8 +514,7 @@ end function az_loss
   real function lambda_ee(ne, Te)
     double precision  ::ne, Te
 !    real              ::ne, Te
-!    lambda_ee = 23.5-.5*log(ne*sqrt(Te**(-5.0)))-sqrt((1.0e-5) + (((log(Te)-2.0)**2.0)/16.0))
-    lambda_ee = 23.5-.5*log(sqrt(ne*Te**(-5.0/2.0)))-sqrt((1.0e-5) + (((log(Te)-2.0)**2.0)/16.0))
+    lambda_ee = 23.5-.5*log(ne*sqrt(Te**(-5)))-sqrt((1.0e-5) + (((log(Te)-2)**2)/16))
   end function lambda_ee
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!SPACER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !From NRL plasma formulary rev 2007 pg. 34
@@ -541,7 +527,7 @@ end function az_loss
      cond2=10.0*zi*zi
 
      if(cond1<Te .and. Te<cond2) then
-       lambda_ei= 23 - log(sqrt(ne)*zi*zi/(Te**3/2))   
+       lambda_ei= 23 - log(ne*zi*zi/(Te**3))/2   
 !       print *, "CASE: 1"  , "    Lambda:", lambda_ei
      elseif(cond1<cond2 .and. cond2<Te) then
        lambda_ei= 24 - log(sqrt(ne)/Te)     
@@ -551,7 +537,7 @@ end function az_loss
 !       print *, "CASE: 3"  , "    Lambda:", lambda_ei
      else
 !       print *, "Coulomb case not found: lambda_ei in functions.f90" !fix
-       lambda_ei= 23 - log(sqrt(ne)*zi*zi/(Te**3/2))  !default to first case
+       lambda_ei= 23 - log(ne*zi*zi/(Te**3))/2  !default to first case
      endif
 
   end function lambda_ei
@@ -645,6 +631,7 @@ end function az_loss
     end do
 
     nu_ee=top/bot
+
   end function nu_ee  
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!SPACER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   real function nu_ii(n1, T1, z1, mu1, n2, T2, z2, mu2)
@@ -660,7 +647,7 @@ end function az_loss
     m2=mu2*mpg
     do i=1, LAT_SIZE
       lambda=lambda_ii(n1(i), T1, z1, mu1, n2(i), T2, z2, mu2)
-      nu_arr(i)= (1.8e-19)*sqrt(m1*m2)*z1*z1*z2*z2*n1(i)*n2(i)*lambda/sqrt((m1*T1+m2*T2)**3)
+      nu_arr(i)= (1.8e-19)*sqrt(m1*m2)*z1*z1*z2*z2*n1(i)*n2(i)*lambda/sqrt((m1*T2+m2*T1)**3)
     end do
 
     top=0.0
@@ -731,18 +718,22 @@ end function az_loss
     end do
 
     do i=1, LAT_SIZE
-      rad_sp(i)=interpolate(ind, ind%emis_sp, x, yarr(i), T%elec, lat%elec(i), i)*lat%sp(i)
-      rad_s2p(i)=interpolate(ind, ind%emis_s2p, x, yarr(i), T%elec, lat%elec(i), i)*lat%s2p(i)
-      rad_s3p(i)=interpolate(ind, ind%emis_s3p, x, yarr(i), T%elec, lat%elec(i), i)*lat%s3p(i)
-      rad_op(i)=interpolate(ind, ind%emis_op, x, yarr(i), T%elec, lat%elec(i), i)*lat%op(i)
-      rad_o2p(i)=interpolate(ind, ind%emis_o2p, x, yarr(i), T%elec, lat%elec(i), i)*lat%o2p(i)
-
+!      print *, "ind = ", ind
+!      print *, "ind%emis_sp = ", ind%emis_sp
+      !print *, "T%elec = ", T%elec
+      rad_sp(i)=interpolate(ind, ind%emis_sp, x, yarr(i), T%elec, lat%elec(i))*lat%sp(i)
+      rad_s2p(i)=interpolate(ind, ind%emis_s2p, x, yarr(i), T%elec, lat%elec(i))*lat%s2p(i)
+      rad_s3p(i)=interpolate(ind, ind%emis_s3p, x, yarr(i), T%elec, lat%elec(i))*lat%s3p(i)
+      rad_op(i)=interpolate(ind, ind%emis_op, x, yarr(i), T%elec, lat%elec(i))*lat%op(i)
+      rad_o2p(i)=interpolate(ind, ind%emis_o2p, x, yarr(i), T%elec, lat%elec(i))*lat%o2p(i)
+!      rad_sp(i)=interpolate_II(ind, ind%emis_sp, x, yarr(i))*lat%sp(i)
 !      rad_s2p(i)=interpolate_II(ind, ind%emis_s2p, x, yarr(i))*lat%s2p(i)
 !      rad_s3p(i)=interpolate_II(ind, ind%emis_s3p, x, yarr(i))*lat%s3p(i)
 !      rad_op(i)=interpolate_II(ind, ind%emis_op, x, yarr(i))*lat%op(i)
 !      rad_o2p(i)=interpolate_II(ind, ind%emis_o2p, x, yarr(i))*lat%o2p(i)
       rad_tot(i)=rad_sp(i) + rad_s2p(i) + rad_s3p(i) + rad_op(i) +rad_o2p(i)
 !    print *, i, "<====>", rad_tot(i)
+!      print *, "rad_sp(i) == ", rad_sp(i)
       ft_rad=ft_rad+rad_tot(i)*lat%elec(i)
       elec_tot=elec_tot + lat%elec(i)
     end do
@@ -795,14 +786,13 @@ end function az_loss
 
   end function interpolate_II
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!SPACER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  real function interpolate(ind, table, tl, nl, t, n, i)
+  real function interpolate(ind, table, tl, nl, t, n)
     type(r_ind)       ::ind
     double precision  ::t, n
     integer           ::ti, ni !x and y indices for table search
     real              ::tgt, tlt, ngt, nlt, table(EMIS_SIZE, EMIS_SIZE) !temperature greater than, less than, same for density....etc.
     double precision  ::tslope, nslope
     real              ::tl, nl
-    integer           ::i
 
    ti=INT(tl)
    ni=INT(nl)
@@ -818,7 +808,7 @@ end function az_loss
    nlt=ind%emis_dens(ni)
 
    if ( t > ind%emis_temp(EMIS_SIZE) .or. n > ind%emis_dens(EMIS_SIZE) .or. t < ind%emis_temp(1) .or. n < ind%emis_dens(1) ) then
-     if ( .not. HUSH .and. HUSH) then !THIS VARIABLE IS SET IN THE DEBUG MODULE
+     if ( .not. HUSH ) then !THIS VARIABLE IS SET IN THE DEBUG MODULE
        print *, "interpolate function out of bounds(called by ft_rad)"
        print *, "t : ",t
        print *, "n : ",n
@@ -888,7 +878,7 @@ end function az_loss
 
     ipTot= 2.0 * ipPer * n%elec /3.0
 
-    EF_elec= Teq - (2.0 * rad / 3.0) - ipTot - (dep%transport * n%elec * T%elec) 
+    EF_elec= Teq - (2.0 * rad / 3.0) - (dep%transport * n%elec * T%elec) -ipTot
 
   end function EF_elec
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!SPACER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -903,13 +893,13 @@ end function az_loss
 
     double precision   ::Teq !(Equilibrium temp)
     double precision   ::S, L
-
+   
     S= T%pu_s * (ft%is + ft%ish + ft%cx(2) + ft%cx(3) + ft%cx(5) &
               +  ft%cx(10) + ft%cx(11))                          &
-              + T%s2p  * (ft%rs2p + ft%cx(1) + ft%cx(3) + ft%cx(13))
+     + T%s2p  * (ft%rs2p + ft%cx(1) + ft%cx(3) + ft%cx(13))
 
     L= T%sp * (ft%isp + ft%isph + ft%rsp + ft%cx(1) + ft%cx(2) &
-            +  ft%cx(9) + ft%cx(14) + ft%cx(17) &               
+            +  ft%cx(9) + ft%cx(14) + ft%cx(17)                &
             +  dep%transport * n%sp * ROOTPI * h%sp)
 !    if( Euler ) L=L+az_loss(v_ion,nrg%op)
 
@@ -942,7 +932,7 @@ end function az_loss
      + T%s3p  * (ft%rs3p + ft%cx(5) + ft%cx(15) + ft%cx(17))
 
     L= T%s2p * (ft%is2p + ft%is2ph + ft%rs2p + ft%cx(1) + ft%cx(3) &
-            +  ft%cx(4) + ft%cx(13) + ft%cx(16)  &              
+            +  ft%cx(4) + ft%cx(13) + ft%cx(16)                &
             +  dep%transport * n%s2p * ROOTPI * h%s2p)
 
     Teq= v%sp_s2p *(T%sp    - T%s2p)&
@@ -1034,7 +1024,7 @@ end function az_loss
      + T%op   * (ft%iop + ft%ioph)
 
     L= T%o2p * (ft%io2p + ft%io2ph + ft%ro2p + ft%cx(7) + ft%cx(8) &
-             +  ft%cx(11) + ft%cx(12) + ft%cx(14) + ft%cx(16) &     
+             +  ft%cx(11) + ft%cx(12) + ft%cx(14) + ft%cx(16)      &
              +  dep%transport * n%o2p * ROOTPI * h%o2p)
 
 
@@ -1077,6 +1067,7 @@ subroutine energyBudget(n, h, T, dep, ind, ft, lat, v, nrgy)
            v%sp_elec*(T%elec-T%sp)
 
   ion_sp   = T%pu_s*ft%is /(ROOTPI*h%sp)
+  !print *, "T%pu_s, ft%is, h%sp = ", T%pu_s, ft%is, h%sp
   ionh_sp  = T%pu_s*ft%ish/(ROOTPI*h%sp)
   cx_sp    = T%pu_s*(ft%cx(2) + ft%cx(3) + ft%cx(5) + ft%cx(10) + ft%cx(11))/(ROOTPI*h%sp)
   fast_sp  = T%sp*(ft%cx(2) + ft%cx(9))/(ROOTPI*h%sp)
@@ -1112,9 +1103,11 @@ subroutine energyBudget(n, h, T, dep, ind, ft, lat, v, nrgy)
            v%op_elec*(T%elec-T%op)
 
   ion_op   = T%pu_o*ft%io /(ROOTPI*h%op)
+  !print *, "T%pu_o, ft%io, h%op = ", T%pu_o, ft%io, h%op
   ionh_op  = T%pu_o*ft%ioh/(ROOTPI*h%op)
   cx_op    = T%pu_o*(ft%cx(6) + ft%cx(7) + ft%cx(9) + ft%cx(13) + ft%cx(15))/(ROOTPI*h%op)
-  fast_op  = T%op*(ft%cx(7) + ft%cx(10))/(ROOTPI*h%op)
+  fast_op  = T%op*(ft%cx(6) + ft%cx(10))/(ROOTPI*h%op)
+  print *, "T%op, ft%cx(6), ft%cx(10) = ", T%op, ft%cx(6), ft%cx(10)
   trans_op = T%op*(dep%transport*n%op)
 
   Teq_o2p = v%sp_o2p*  (T%sp-  T%o2p) + &
@@ -1140,20 +1133,23 @@ subroutine energyBudget(n, h, T, dep, ind, ft, lat, v, nrgy)
   nrgy%tot_eq      = 1.5 * (Teq_sp + Teq_s2p + Teq_s3p + Teq_op + Teq_o2p)
 
   nrgy%s_ion = 1.5 * (ion_sp + ionh_sp + ion_s2p + ionh_s2p + ion_s3p + ionh_s3p)
+  !print *, "nrgy%sp, h_sp, s2p, h_s2p, s3p, h_s3p = ", ion_sp, ionh_sp, ion_s2p, ionh_s2p, ion_s3p, ionh_s3p
   nrgy%o_ion = 1.5 * (ion_op + ionh_op + ion_o2p + ionh_o2p)
   nrgy%s_cx  = 1.5 * (cx_sp + cx_s2p) ! + cx_s3p)
   nrgy%o_cx  = 1.5 * (cx_op + cx_o2p)
 
   nrgy%P_in  = nrgy%s_ion + nrgy%o_ion + nrgy%s_cx + nrgy%o_cx + nrgy%elecHot_eq
 
-  nrgy%Pfast  = 1.5 * (fast_sp + fast_s2p + fast_op + fast_o2p)
-  nrgy%Puv    = ft_rad(lat, T, ind)
+  nrgy%Pfast = 1.5 * (fast_sp + fast_s2p + fast_op + fast_o2p)
+  nrgy%Puv   = ft_rad(lat, T, ind)
 
   nrgy%Ptrans         = 1.5 * dep%transport * (n%sp*T%sp + n%s2p*T%s2p + n%s3p*T%s3p + n%op*T%op + n%o2p*T%o2p + n%elec*T%elec)
   nrgy%Ptrans_elecHot = 1.5 * dep%transport * n%elecHot * T%elecHot
 
   nrgy%P_out = nrgy%puv + nrgy%pfast + nrgy%ptrans + nrgy%ptrans_elecHot
 
+!  print *, nrgy%elecHot_eq, Teq_elh
+!   call output(v)
 
 end subroutine energyBudget
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!SPACER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

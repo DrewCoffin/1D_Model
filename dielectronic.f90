@@ -114,7 +114,7 @@ CONTAINS
     if(t<minTemp .or. t>maxTemp) then
       print *, "temp is out of bounds of the Sulphur recombination chart"
       print *, "t = ", t
-      print *, "grid = ", mype
+      print *, "grid = ", mygrid
       stop
     endif
 

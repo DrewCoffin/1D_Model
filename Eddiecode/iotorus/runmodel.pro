@@ -6,6 +6,7 @@ Pro runmodel
   ; = sqrt(pi)*.5*RJcm
   
   tot2cms = sqrt(!dpi)*0.5*!rjkm*1e5
+  dtor = !dpi/180.0
   ; create structure to hold all input parameters
   input = create_struct( 'source', 7.20e-4*tot2cms, $ ; [# cm^-3 s^-1]
                          'o_to_s',     1.7    , $ ; ratio
@@ -21,8 +22,6 @@ Pro runmodel
                         'hote_t0',     0.0     , $ ; hot e fraction perturb, inital time [DOY 2000]
                      'hote_width',     0.0       ) ; width of hot e fraction perturb [days]
   
-  ;print,tot2cms
-  ;print, tot2cms*!rjkm^2*1e10
   ; structure containing energy values
   energy = {energy, s_ion: 0.0, s_cx: 0.0, o_ion: 0.0, o_cx: 0.0, eh_eq: 0.0, tot_eq: 0.0, P_in: 0.0, $
             Puv: 0.0, Pfast: 0.0, Ptrans: 0.0, Ptrans_eh: 0.0, P_out: 0.0}

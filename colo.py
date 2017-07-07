@@ -2,7 +2,7 @@ import os
 import sys
 
 def readval(sp, param):
-   file = open('plots/data/' + sp + '/' + param + '/' + param + sp + '0200.dat')
+   file = open('plots/data/' + sp + '/' + param + '/' + param + sp + '0010.dat')
    line = file.readline().strip()
    file.close()
    llist = line.split(' ')

@@ -17,6 +17,6 @@ type(recomb)         ::rec_tables !Holds recombinaion tables read in dielectroni
 
 logical              ::trans_type=.false.
 
-real                 ::protons=0.1 !<can be added to inputs.dat
+real                 ::protons=0.1  !<can be added to inputs.dat
 
 END MODULE GLOBAL

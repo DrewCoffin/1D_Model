@@ -1,4 +1,4 @@
-1.15e28              source (/cm3*s)
+4561785.8             source (/cm3*s)
 1.70                  o_to_s
 0.003                 fehot_const (fraction of electrons that are hot)
 50.0                  transport (days)
@@ -10,6 +10,6 @@
 0.0                   hote_amp
 55.0                  hote_t0
 45.5                  hote_width
-200                   number of days for the run
+1                     number of days for the run
 10                    number of outputs per day
 0.00                  s value for upwind scheme

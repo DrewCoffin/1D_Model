@@ -179,7 +179,7 @@ v_corot = 2. * !pi * rdist * !rjkm / (9.925 * 3600.)
 v = v_corot - lag_const + lag_amp * cos((l3-lag_phase)*!dtor)
 omega = v/(rdist*!rjkm) 
 
-mp = 1.67e-27
+mp = 1.67262e-27
 ms = 32.*mp 
 mo = 16.*mp
 
@@ -189,6 +189,7 @@ h.s2p = sqrt(2.0*T.s2p*1.6e-19*(1+2.*T.el/T.s2p)/(3.0*ms*omega^2))/1e3
 h.s3p = sqrt(2.0*T.s3p*1.6e-19*(1+3.*T.el/T.s3p)/(3.0*ms*omega^2))/1e3
 ;h.s4p = sqrt(2.0*T.s4p*1.6e-19*(1+4.*T.el/T.s4p)/(3.0*ms*omega^2))/1e3
 h.op  = sqrt(2.0*T.op *1.6e-19*(1+1.*T.el/T.op)/(3.0*mo*omega^2))/1e3
+print, "T.op, T.el = ", T.op, T.el
 h.o2p = sqrt(2.0*T.o2p*1.6e-19*(1+2.*T.el/T.o2p)/(3.0*mo*omega^2))/1e3
 
 if check_math(mask=211,/noclear) gt 0 then stop
@@ -290,7 +291,6 @@ r_dep.transport = 1/(tau*8.64e4)
 ; by 1e5.
 r_ind.S_production = fs*net_source/(!rootpi*(h[0].s*1e5))
 r_ind.O_production = fo*net_source/(!rootpi*(h[0].o*1e5))
-
 end
 
 ;-----------------------------------------------------------------------
@@ -690,6 +690,7 @@ rad_s3p = emisS3p*nS3p
 rad_Op  = emisOp*nOp
 rad_O2p = emisO2p*nO2p
 
+; print, "rad_sp = ", rad_sp
 ; total power emitted by cc at equator
 rad_tot = rad_sp + rad_s2p + rad_s3p + rad_op + rad_o2p
 
@@ -730,6 +731,7 @@ densindex=100.*alog10(nel)/log5000
 
 ; radiation rates
 emisSp  = interpolate(r_ind.emisSp,tempindex,densindex)
+print, "ind.emisSp = ", r_ind.emisSp
 emisS2p = interpolate(r_ind.emisS2p,tempindex,densindex)
 emisS3p = interpolate(r_ind.emisS3p,tempindex,densindex)
 emisOp  = interpolate(r_ind.emisOp,tempindex,densindex)
@@ -1018,7 +1020,7 @@ pro printEF, n, T, h, r_ind, r_dep, lat_dist, nu, ftint
   ip_per_e = en_ip / Ne_tot
 
   ip_loss = (2./3.) * ip_per_e * n.el
-  ; The factor of 2/3 is neccecssary since these quantities are in
+  ; The factor of 2/3 is necessary since these quantities are in
   ; energy, but we're really tracking temperature in this code. 
   EF_el = Teq - (2./3.) * rad - r_dep.transport * n.el  * T.el-ip_loss
 
@@ -1340,6 +1342,7 @@ nT1.s3p = (nT.s3p + dt * EFs3p) > 0.
 nT1.op  = (nT.op  + dt * EFop)  > 0.
 nT1.o2p = (nT.o2p + dt * EFo2p) > 0.
 nT1.el  = (nT.el  + dt * EFel)  > 0.
+;print, "EFel = ", EFel
 
 update_temp,n1,nT1,T1
 get_scale_heights,h1,T1,n1
@@ -1405,6 +1408,8 @@ nTp.s3p = (nT.s3p + dt * 0.5 * (EFs3p + EF_s3p(n1,T1,r_ind,r1_dep,h1,nu1, ftint)
 nTp.op  = (nT.op  + dt * 0.5 * (EFop  + EF_op(n1,T1,r_ind,r1_dep,h1,nu1, ftint)))  > 0.
 nTp.o2p = (nT.o2p + dt * 0.5 * (EFo2p + EF_o2p(n1,T1,r_ind,r1_dep,h1,nu1, ftint))) > 0.
 nTp.el  = (nT.el  + dt * 0.5 * (EFel  + EF_el(n1,T1,h1, r_ind,r1_dep,lat_dist1,nu1, ftint))) > 0.
+print, "EFel, EFel(stuff) = ", EFel, EF_el(n1,T1,h1, r_ind,r1_dep,lat_dist1,nu1, ftint)
+;print, "Teq, rad, r_dep.transport, n.el, T.el, ip_loss = ", Teq, rad, r_dep.transport, n.el, T.el, ip_loss
 
 update_temp,np,nTp,Tp
 
@@ -1489,9 +1494,11 @@ pro energy_budget, n, h, T, r_dep, r_ind, ftint, lat_dist, nu, energy;, print = 
 
   ; ionization, charge exchange, fast neutrals and transport of op
   ion_op   = T.pu_o*ftint.io /(!rootpi*h.op)
+  print, "T.pu_o, ftint.io, h.op = ", T.pu_o, ftint.io, h.op
   ionh_op  = T.pu_o*ftint.ioh/(!rootpi*h.op)
   cx_op    = T.pu_o*(ftint.cx_k5 + ftint.cx_k6 + ftint.cx_k8 + ftint.cx_k12 + ftint.cx_k14)/(!rootpi*h.op)
   fast_op  = T.op*(ftint.cx_k5 + ftint.cx_k9)/(!rootpi*h.op)
+  print, "T%op, ft%cx(7), ft%cx(10) = ", T.op, ftint.cx_k5, ftint.cx_k9
   trans_op = T.op*(r_dep.transport*n.op)
   
   ; thermal equilibrium of o2p
@@ -1526,6 +1533,7 @@ pro energy_budget, n, h, T, r_dep, r_ind, ftint, lat_dist, nu, energy;, print = 
 
   ; total energy from ionization and charge exchange for both sulfur and oxygen
   energy.s_ion = f*(ion_sp + ionh_sp + ion_s2p + ionh_s2p + ion_s3p + ionh_s3p)
+  ;print, "energy.sp, h_sp, s2p, h_s2p, s3p, h_s3p = ", ion_sp,  ionh_sp,  ion_s2p,  ionh_s2p,  ion_s3p,  ionh_s3p
   energy.o_ion = f*(ion_op + ionh_op + ion_o2p + ionh_o2p)
   energy.s_cx  = f*(cx_sp + cx_s2p); + cx_s3p)
   energy.o_cx  = f*(cx_op + cx_o2p)

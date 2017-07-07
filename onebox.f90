@@ -14,7 +14,7 @@ PROGRAM Onebox
   USE INPUTS
   USE FTMIX
   USE PARALLELVARIABLES
-  USE OUTPUTS
+  USE OUTPUTDATA
   USE MPI
 
   IMPLICIT NONE
@@ -24,9 +24,8 @@ PROGRAM Onebox
   call MPI_INIT(ierr)
   call MPI_COMM_RANK(MPI_COMM_WORLD, mype, ierr)
   call MPI_COMM_SIZE(MPI_COMM_WORLD, npes, ierr)
-  
-  mygrid=mype+1
-
+    mygrid=mype+1 
+  open(unit=21,file="/home/dcoffin/1D_Model/values.dat")
   write (x1, '(I3.3)') mygrid !write the integer 'mygrid' to non-existent file
  
   num_char=trim(x1)  !trim non-existent file and store as num_char
@@ -68,10 +67,15 @@ subroutine model()
   real                ::longitude, elecHot_multiplier, intensity, n_ave, T_ave, test_multiplier, volume, dr
 
 !  call initNu(v)
+ 
+  write(21,*) "~~~~FROM ONEBOX~~~~"
+  write(21,*) "mype: ",mype !!!!!
   longitude = (mype * 360.0 / LNG_GRID)
 
+  write(21,*) "longitude: ",longitude !!!!!
+
   do i=1, LAT_SIZE
-    lat%z(i)= (i-1) * Rj / 10.0  !Initializing lat%z
+    lat%z(i)= (i-1) * Rj / 5.0   !Initializing lat%z
   end do
 
   call readInputs()  !call to input.f90 module to read initial variables from 'input.dat'
@@ -84,30 +88,46 @@ subroutine model()
 
 !set dt (2000)
   dt=750.0 
+  write(21,*) "dt: ",dt !!!!! 
 ! source = source *2000.0/dt
 
 !set run time
+  write(21,*) "run_days: ", run_days !!!!!
   runt=run_days*8.64e4 !one day = 86400 seconds
-
+  write(21,*) "runt: ",runt !!!!! 
   nit=(runt/dt)+1 ! number of iterations to reach run_days
+  !nit=5
+ write(21,*) "nit: ",nit !!!!! 
 
 !set radial distance
   rdist= 6.0   !in Rj
   dr=Rj
   volume=PI*((((rdist*Rj+1.5*Rj)*1.0e5))**2 - ((rdist*Rj)*1.0e5)**2)*0.5*ROOTPI*Rj*1.0e5
+  write(21,*) "volume: ",volume !!!!! 
   torus_circumference = Rj * rdist * 2.0 * PI
   dx = torus_circumference / LNG_GRID
+  write(21,*) "dx: ",dx !!!!! 
   numerical_c_neutral = v_neutral*dt/dx
+  write(21,*) "numerical_c_neutral: ",numerical_c_neutral !!!!! 
   numerical_c_ion = v_ion*dt/dx
+  write(21,*) "numerical_c_ion: ",numerical_c_ion !!!!! 
 
 !set sys3 longitude of box
   lon3=200
 
 !set zoff
-  zoff= abs(6.4* cos((lon3-longitude) * dTOr) * dTOr * rdist * Rj) !in km
+  write(21,*) "longitude: ", longitude  !!!!! 
+  !theta_offset = (6.4*cos((lon3-longitude)*dTOr)*dTOr)
+  !write(21,*) "theta_offset: ", theta_offset  !!!!! 
+  write(21,*) "Rj: ", Rj
+!!!!!  zoff= abs((6.4*cos((lon3-longitude)*dTOr)*dTOr) * rdist * Rj) !in km (This calculation depends on mype, before switch to mathc idl model
+
+zoff = abs((6.4*cos((110-200)*dTOr)*dTOr)*rdist*Rj) !!!!! Matches IDL model
+  write(21,*) "zoff: ",zoff !!!!! 
   n_height = Rj/2.0
 
   tm0=0.01 
+  write(21,*) "tm0: ",tm0 !!!!! 
 
 !set density values
   const=1800.0
@@ -116,13 +136,19 @@ subroutine model()
   if( test_pattern ) then
 !!    if( rdist .gt. 7.0 .and. rdist .lt. 9.0) test_multiplier=4.0
     test_multiplier=1.0+0.2*cos(2.0*longitude*dTOr)
+    write(21,*) "test_multiplier: ",test_multiplier !!!!! 
   endif
 
   n%sp = 0.060 * const * test_multiplier!* (rdist/6.0)**(-8.0)
+  write(21,*) "n%sp: ",n%sp !!!!! 
   n%s2p= 0.212 * const * test_multiplier!* (rdist/6.0)**(-8.0)
+  write(21,*) "n%s2p: ",n%s2p !!!!!
   n%s3p= 0.034 * const * test_multiplier!* (rdist/6.0)**(-3.0)
+  write(21,*) "n%s3p: ",n%s3p !!!!!
   n%op = 0.242 * const * test_multiplier!* (rdist/6.0)**(-8.0)
-  n%o2p= 0.242 * const * test_multiplier!* (rdist/6.0)**(-3.0)
+  write(21,*) "n%op: ",n%op !!!!!
+  n%o2p= 0.123 * n%op * test_multiplier!* (rdist/6.0)**(-3.0)
+  write(21,*) "n%o2p: ",n%o2p !!!!!
 
 !  n%sp = 150.0 * test_multiplier
 !  n%s2p= 600.0 * test_multiplier
@@ -131,21 +157,32 @@ subroutine model()
 !  n%o2p=  40.0 * test_multiplier
 
   n%s=25.0 * test_multiplier
+  write(21,*) "n%s: ",n%s !!!!!
   n%o=50.0 * test_multiplier
+  write(21,*) "n%o: ",n%o !!!!!
 
 
   Te0 = 5.0
   Ti0 = 70.0
   Teh0= tehot
+  write(21,*) "Teh0: ",Teh0 !!!!!
   if(Teh0 .gt. 400.0) Teh0=400.0
   n%fh=fehot_const
+  write(21,*) "n%fh: ",n%fh !!!!!
   trans = 1.646851e-7 !4.62963e-7
-  net_source=source/volume
+  write(21,*) "trans: ",trans !!!!!
+  !net_source=source/volume
+  net_source = source !!!!!
+  !net_source = 6.3e6 !!!!! set to match idl calculation independant of volume
+  write(21,*) "net_source: ",net_source !!!!!
   print *, net_source
-  n%elec = (n%sp + n%op + 2 * (n%s2p + n%o2p) + 3 * n%s3p) * (1.0 - n%protons)
+  n%elec = (n%sp + n%op + (2.0 * (n%s2p + n%o2p)) + (3.0 * n%s3p)) * (1.0 - protons)
+  write(21,*) "n%elec: ",n%elec !!!!!
   n%elecHot = n%fh * n%elec / (1.0-n%fh)
+  write(21,*) "n%elecHot: ",n%elecHot !!!!!
 
   n%fc = 1.0 - n%fh
+  write(21,*) "n%fc: ",n%fc !!!!!
 
 !set temp values
   T%sp      = Ti0
@@ -156,45 +193,81 @@ subroutine model()
   T%elec    = Te0
   T%elecHot = Teh0
   
+  write(21,*) "~~~SETTING INITIAL TEMPS~~~" !!!!!
+  write(21,*) "T%sp: ",T%sp !!!!!  
+  write(21,*) "T%s2p: ",T%s2p !!!!!
+  write(21,*) "T%s3p: ",T%s3p !!!!!
+  write(21,*) "T%op: ",T%op !!!!!
+  write(21,*) "T%o2p: ",T%o2p !!!!!
+  write(21,*) "T%elec: ",T%elec !!!!!
+  write(21,*) "T%elecHot: ",T%elecHot !!!!!
+  
 
 !get scale heights 
   call get_scale_heights(h, T, n)
-
+  write(21,*) "h: ",h !!!!!
+  write(21,*) "T: ",T !!!!!
+  write(21,*) "n: ",n !!!!! 
   if (protons > 0.0) then
     n%protons = protons
   endif
-
+  write(21,*) "n%protons: ",n%protons !!!!!
   ind%o_to_s= o_to_s
+ ! write(21,*) "ind%o: ",ind%o !!!!!
   ind%o2s_spike=2.0
+ ! write(21,*) "ind%o2s: ",ind%o2s !!!!!
 
   tau0=transport !1.0/(trans*8.64e4)
+  write(21,*) "tau0: ",tau0 !!!!!
   print *, tau0
   net_source0=net_source 
   !fh0 = fehot_const
 
   h%s=n_height
+  write(21,*) "h%s: ",h%s !!!!!
   h%o=n_height
+  write(21,*) "h%o: ",h%o !!!!!
 
   call InitIndependentRates(ind)
 
   T%pu_s = Tpu(32.0, rdist*1.0)
+  write(21,*) "T%pu_s: ",T%pu_s !!!!!
   T%pu_o = Tpu(16.0, rdist*1.0)
+  write(21,*) "T%pu_o: ",T%pu_o !!!!!
 
   T%elecHot=Teh0
+  write(21,*) "T%elecHot: ",T%elecHot !!!!!
 
   call independent_rates(ind, T, h)
 
-  n%fc= 1.0 - n%fh   
+  !n%fh = protons
+  !n%fc= 1.0 - n%fh 
+  write(21,*) "n%fc: ",n%fc !!!!!
 
-  n%elec = ((n%sp + n%op) + 2.0*(n%s2p + n%o2p) + 3.0 * n%s3p)/(1.0-n%protons)
+  write(21,*) "n%sp: ",n%sp !!!!!   
+  write(21,*) "n%s2p: ",n%s2p !!!!!   
+  write(21,*) "n%s3p: ",n%s3p !!!!!   
+  write(21,*) "n%op: ",n%op !!!!!   
+  write(21,*) "n%o2p: ",n%o2p !!!!!   
+  write(21,*) "protons: ", protons !!!!!
+  n%elec = ((n%sp + n%op) + 2.0*(n%s2p + n%o2p) + 3.0 * n%s3p)*(1.0-n%protons)
+  write(21,*) "n%elec: ",n%elec !!!!!
   n%elecHot = n%elec * n%fh/n%fc
+  write(21,*) "n%elecHot: ",n%elecHot !!!!!
   nrg%elec = n%elec * T%elec
+  write(21,*) "nrg%elec: ",nrg%elec !!!!!
   nrg%elecHot = n%elecHot * T%elecHot
+  write(21,*) "nrg%elecHot: ",nrg%elecHot !!!!!
   nrg%sp = n%sp * T%sp
+  write(21,*) "nrg%sp: ",nrg%sp !!!!!
   nrg%s2p = n%s2p * T%s2p
+  write(21,*) "nrg%s2p: ",nrg%s2p !!!!!
   nrg%s3p = n%s3p * T%s3p
+  write(21,*) "nrg%s3p: ",nrg%s3p !!!!!
   nrg%op = n%op * T%op
+  write(21,*) "nrg%op: ",nrg%op !!!!!
   nrg%o2p = n%o2p * T%o2p
+  write(21,*) "nrg%o2p: ",nrg%o2p !!!!!
 
   ni=n
   np=n
@@ -224,7 +297,7 @@ subroutine model()
 !-----------------------Interation loop-------------------------------------------------------------------------------------------------
   do i=1, nit
     tm = tm0 + (i-1) * dt / 86400.0
-
+     write(21,*) "iteration: ",i !!!!!   
 !----------------------time dependent neutral source rate-------------------------------------------------------------------------------
     var =exp(-((tm-neutral_t0)/neutral_width)**2)
     var2 =exp(-((tm-hote_t0)/neutral_width)**2)
@@ -235,14 +308,20 @@ subroutine model()
         net_source = LNG_GRID*net_source0*(1.0+neutral_amp*var)
       else
         if( i .eq. 1 ) then
+         write(21,*) "~~~net_source is being called at if i=1 ~~~"
           net_source = net_source0*(1.0+neutral_amp*var)
         else
+          write(21,*) "~~~net_source is being called at net_source=0 ~~~"
           net_source=0
         endif
       endif
     endif
 
     if( .not. moving_Io ) then
+       write(21,*) "~~~net_source is being called at .not. moving_io~~~"
+       write(21,*) "net_source0: ",net_source0 !!!!! 
+       write(21,*) "neutral_amp: ",neutral_amp !!!!!
+       write(21,*) "var: ",var !!!!! 
       net_source = (net_source0*(1.0 + neutral_amp*var))!/LNG_GRID !ubiquitous
     endif
 !----------------------time dependent neutral source rate-------------------------------------------------------------------------------
@@ -256,8 +335,9 @@ subroutine model()
 
 !----------------------hot electrons-------------------------------------------------------------------------------
     if( sys3hot ) then
-      elecHot_multiplier=elecHot_multiplier*(1.0+sys3_amp*(cos((290.0-longitude)*dTOr)))
+      elecHot_multiplier=elecHot_multiplier*(1.0) !+sys3_amp*(cos((290.0-longitude)*dTOr)))
     endif
+    
 
     if( sys4hot ) then
       elecHot_multiplier=elecHot_multiplier&
@@ -265,18 +345,27 @@ subroutine model()
     endif
 
  !   elecHot_multiplier=elecHot_multiplier*(1.0+0.4*(mass_loading/ave_loading))
+   
+    write(21,*) "elecHot_multiplier: ",elecHot_multiplier !!!!!  
 
     n%fh  = fehot_const * (1.0 + hote_amp * var)*elecHot_multiplier
 
+    write(21,*) "next calculation of n%fh: ",n%fh !!!!!  
     ni%fh = n%fh
+    write(21,*) "ni%fh: ",ni%fh !!!!!  
     np%fh = n%fh
-
+    write(21,*) "np%fh: ",np%fh !!!!!  
     n%fc  = 1.0 - n%fh
+    write(21,*) "n%fc: ",n%fc !!!!!  
     ni%fc = n%fc
+    write(21,*) "ni%fc: ",ni%fc !!!!!  
     np%fc = n%fc
+    write(21,*) "np%fc: ",np%fc !!!!!  
 
-    n%elecHot = n%elec * n%fh/n%fc
+   !!!!! n%elecHot = n%elec * n%fh/n%fc!!!!!
+    n%elecHot = (n%fh * n%elec)/(n%fc) !!!!! Added this instead of above calculation
     nrg%elecHot = n%elecHot * T%elecHot
+    write(21,*) "nrg%elecHot: ",nrg%elecHot !!!!!  
 
     do j=1, LAT_SIZE
       lat%elec(j) = n%elec!*exp(-(lat%z(j)/h%elec)**2)
@@ -345,12 +434,14 @@ subroutine model()
           if(OUTPUT_DENS) call IonElecOutput(n%sp, n%s2p, n%s3p, n%op, n%o2p, n%elec, 360.0, day_char, 'DENS')
           if(OUTPUT_MIXR) then  
             plot = ftint_mix(n, h) !calculate values to be plotted
+            !print *, "ftmix = ", plot 
             call IonOutput(plot%sp, plot%s2p, plot%s3p, plot%op, plot%o2p, 360.0, day_char, 'MIXR')
           endif
           if(OUTPUT_TEMP) call IonElecOutput(T%sp, T%s2p, T%s3p, T%op, T%o2p, T%elec, 360.0, day_char, 'TEMP')
           if(OUTPUT_INTS) then !Intensity
             call IonOutput(n%sp*T%sp, n%s2p*T%s2p, n%s3p*T%s3p, n%op*T%op, n%o2p*T%o2p, 360.0, day_char, 'INTS')
             intensity= n%sp*T_ave/(n_ave*T%sp)
+            write(21,*) "intensity: ", intensity !!!!!  
             open(unit=120, file='intensity'//day_char//'.dat', status='unknown', position='append')
               write(120,*) 360.0, intensity 
             close(120)
@@ -359,13 +450,16 @@ subroutine model()
         endif
 
         output_it=output_it + (86400.0/(dt*per_day)) !Determines when data is output. Set for once each run day (86400/dt).
+        write(21,*) "output_it: ",output_it !!!!!  
         file_num = file_num + 1
     endif        
  
     !call Grid_transport(n, nrg)
 !    isNaN=NaNcatch(n%sp, 100, mype) !fix
-    Io_loc = mod(Io_loc+(dt*v_Io), torus_circumference)  
-    sys4_loc = mod(sys4_loc+(dt*v_sys4), torus_circumference)  
+    Io_loc = mod(Io_loc+(dt*v_Io), torus_circumference)
+    write(21,*) "Io_loc: ",Io_loc !!!!!  
+    sys4_loc = mod(sys4_loc+(dt*v_sys4), torus_circumference)
+    write(21,*) "sys4_loc: ",sys4_loc !!!!!  
 
   end do
 !----------------------------------------------------------------------------------------------------------------------------
@@ -380,8 +474,10 @@ subroutine dens_ave(n_ave, n)!, i)
 !  integer             ::i
 
   n_tot=n%sp !+n%s2p+n%s3p+n%op+n%o2p
+ ! write(21,*) "n_tot: ",n_tot !!!!!  
   call MPI_REDUCE(n_tot, n_ave, 1, MPI_REAL, MPI_SUM, 0, MPI_COMM_WORLD, ierr)
   n_ave=n_ave/LNG_GRID
+ ! write(21,*) "n_ave: ",n_ave !!!!! 
   call MPI_BCAST(n_ave, 1, MPI_REAL, 0, MPI_COMM_WORLD, ierr)
 
 !  n_tot=n%sp+n%s2p+n%s3p+n%op+n%o2p
@@ -436,7 +532,7 @@ subroutine FinalOutput(nrgy)
   avg%P_in=avg%P_in/LNG_GRID
 
   call MPI_REDUCE(nrgy%Puv, avg%Puv, LNG_GRID, MPI_REAL, MPI_SUM, 0, MPI_COMM_WORLD, ierr)
-  avg%Puv=avg%Puv
+  avg%Puv=avg%Puv/LNG_GRID
 
   call MPI_REDUCE(nrgy%Pfast, avg%Pfast, LNG_GRID, MPI_REAL, MPI_SUM, 0, MPI_COMM_WORLD, ierr)
   avg%Pfast=avg%Pfast/LNG_GRID
@@ -525,7 +621,7 @@ subroutine FinalTable(nrgy)
 !  print *, 'Hot Electron Amplitude......', hote_amp
 !  print *, 'Hot Electron Initial Temp...', hote_t0
 !  print *, 'Hot Electron Width..........', hote_width
-
+close(21)
 end subroutine FinalTable
 
 subroutine DebugOutput(i, n, h, T, v, nrg)
@@ -725,7 +821,6 @@ double precision function getLoss(v, val)
   getLoss = getLoss - source
 
 end function getLoss
-
 subroutine GetNeighbors(n, nrg)
   type(density)       ::n
   type(nT)            ::nrg
@@ -816,6 +911,8 @@ subroutine GetNeighbors(n, nrg)
   call MPI_RECV(nTright%o2p, 1, MPI_DOUBLE_PRECISION, right, 22, MPI_COMM_WORLD, stat, ierr)
 
 end subroutine GetNeighbors
+
+
 
 END PROGRAM Onebox
 

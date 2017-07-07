@@ -35,6 +35,8 @@ IF NOT keyword_set(filename) THEN filename = '_output'
 tepdir = model_dir
 !p.multi=[0,1,1]
 
+print, " source = ", source
+
 ; Open new window(s) if needed to plot the results
 ;;IF keyword_set(plot) THEN BEGIN
   ;; loadct,39
@@ -54,7 +56,7 @@ tepdir = model_dir
 ;;ENDIF
 
 ; The plasma is not corotating with magnetic field
-if n_elements(lag_const1) gt 0 then lag_const=lag_const1 else lag_const=3.0 ; km/s
+if n_elements(lag_const1) gt 0 then lag_const=lag_const1 else lag_const=0.0 ; km/s
 if n_elements(lag_phase1) gt 0 then lag_phase=lag_phase1 else lag_phase=0. 
 if n_elements(lag_amp1) gt 0 then lag_amp=lag_amp1 else lag_amp=0.    ; km/s
 
@@ -88,11 +90,11 @@ printf,21,FORMAT = '("lontemp: ",I0)', lontemp ;;;;;
 ; Neutral Cloud scale height in km
 theta_offset = 6.4 * cos((l3 - 200.) * !dtor) * !dtor
 
-printf,21,FORMAT = '("theta_offset: ",I0)', theta_offset
+printf,21,FORMAT = '("theta_offset: ",F0)', theta_offset ;;;;;
 
 zoff = abs(theta_offset * rdist * 71492.) ; in km, not cm! Always positive
 
-printf,21,FORMAT = '("zoff: ",I0)', zoff ;;;;;
+printf,21,FORMAT = '("zoff: ",F0)', zoff ;;;;;
 
 IF NOT keyword_set(n_height) THEN n_height = 0.5 * 71492.
 
@@ -269,32 +271,34 @@ endif else begin
    printf,21,FORMAT = '("n.s: ",I0)', n.s ;;;;;
    n.o=50.
    printf,21,FORMAT = '("n.o: ",I0)', n.o ;;;;;
+   n.protons = 0.1
 
 ; January Latavg Conditions
     Te0 = 5.0d
     printf,21,FORMAT = '("Te0: ",I0)', Te0 ;;;;;
     Ti0 = 70.0d
     printf,21,FORMAT = '("Ti0: ",I0)', Ti0 ;;;;;
-    Teh0 = 49.0d
+    Teh0 = 40.0d
     printf,21,FORMAT = '("Teh0: ",I0)', Teh0 ;;;;;
-    fehot_const = 0.0022d
-    printf,21,FORMAT = '("fehot_const: ",I0)', fehot_const ;;;;;
+    n.fh = fehot_const1 ; = 0.003d 
+    printf,21,FORMAT = '("n.fh: ",F0)', n.fh ;;;;;
     trans = 1.0d/(70.28*8.64e4)
     printf,21,FORMAT = '("trans: ",I0)', trans ;;;;;
 ; with a 0.5 Rj scale height for neutrals, this comes out to 9.9e-4 cm-3 s-1
 ; at the equator
-    net_source = 6.3e6
+    net_source = source ;6.3e6
     printf,21,FORMAT = '("net_source: ",I0)', net_source ;;;;;
     otos = 1.7d
     printf,21,FORMAT = '("otos: ",I0)', otos ;;;;;
 
 ; Total electron density
-    n.el = (n.sp + 2 * n.s2p + 3 * n.s3p + 4 * n.s4p + n.op + 2 * n.o2p) * (1.-n.protons)
+    n.el = (n.sp + 2 * n.s2p + 3 * n.s3p + n.op + 2 * n.o2p) * (1.-n.protons)
+    ;printf,21,FORMAT = '("n.protons: ",F0)', n.protons ;;;;
     printf,21,FORMAT = '("n.el: ",I0)', n.el ;;;;;
     n.elh = n.fh/(1.-n.fh) * n.el               ; Hot electron density
-    printf,21,FORMAT = '("n.elh: ",I0)', n.elh ;;;;;
+    printf,21,FORMAT = '("n.elh: ",F0)', n.elh ;;;;;
     n.fc = 1.-n.fh
-    printf,21,FORMAT = '("n.fc: ",I0)', n.fc ;;;;;
+    printf,21,FORMAT = '("n.fh: ",F0)', n.fh ;;;;;
 
 ; Assign Temp values
     T[*].sp = Ti0
@@ -381,7 +385,7 @@ r_ind.emistemp = temp
 r_ind.emisden  = den
 ;rintf,21,FORMAT = '("r_ind.emisden: ",I0)', r_ind.emisden ;;;;;
 r_ind.emisSp   = emisSp
-;rintf,21,FORMAT = '("r_ind.emisSp: ",I0)', r_ind.emisSp ;;;;;
+;rintf,21,FORMAT = '("r_ind.emisSp: ",F0)', r_ind.emisSp ;;;;;
 r_ind.emisS2p  = emisS2p
 ;printf,21,FORMAT = '("r_ind.emisS2p: ",I0)', r_ind.emisS2p ;;;;;
 r_ind.emisS3p  = emisS3p
@@ -444,7 +448,8 @@ printf,21,FORMAT = '("n.fc: ",I0)', n.fc ;;;;;
 
 ;  Ensure charge neutrality in the thermal electron population. We
 ;  assume that the hot electrons are linked to a separate hot proton population.
-n.el = (n.sp + 2.*n.s2p + 3.*n.s3p + 4.*n.s4p + n.op + 2.*n.o2p)/(1.-n.protons)
+;n.el = (n.sp + 2.*n.s2p + 3.*n.s3p + 4.*n.s4p + n.op + 2.*n.o2p)/(1.-n.protons)
+n.el = (n.sp + 2.*n.s2p + 3.*n.s3p + n.op + 2.*n.o2p)*(1.-n.protons)
 printf,21,FORMAT = '("n.el: ",I0)', n.el ;;;;;
 n.elh = n.fh/(1.-n.fh) * n.el
 printf,21,FORMAT = '("n.elh: ",I0)', n.elh ;;;;;
@@ -565,7 +570,7 @@ for j=0,nit-1 do begin
       tm = [tm,time]
       
       ftmix=ftint_mix(n,h)
-      printf,21,FORMAT = '("ftmix: ",I0)', ftmix ;;;;;
+      printf,21,FORMAT = '("ftmix: ",F0)', ftmix ;;;;;
       n_out = n
       t_out = t
       h_out = h
