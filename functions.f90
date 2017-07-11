@@ -240,7 +240,7 @@ MODULE FUNCTIONS
     h%s3p = sqrt(2.0*T%s3p *sc_const*(1+3 *T%elec/T%s3p )/(3.0*ms*omega**2))/(1000.0)
 !    h%s4p = sqrt(2.0*T%s4p *sc_const*(1+4 *T%elec/T%s4p )/(3.0*ms))/(1000.0*omega)
     h%op  = sqrt(2.0*T%op *sc_const*(1+1 *T%elec/T%op )/(3.0*mo*omega**2))/(1000.0)
-    print *, "T%op, T%elec = ", T%op, T%elec
+    !print *, "T%op, T%elec = ", T%op, T%elec
     h%o2p = sqrt(2.0*T%o2p *sc_const*(1+2 *T%elec/T%o2p )/(3.0*mo*omega**2))/(1000.0)
 
   END SUBROUTINE get_scale_heights
@@ -717,10 +717,14 @@ end function az_loss
 !      yarr(i) = lat%elec(i)
     end do
 
+    write(21,*) "--------Inputs for interpolation---------"
+    write(21,*) "ind%emis_sp = ", ind%emis_sp(1,1)
+    write(21,*) "T%elec = ", T%elec
+    write(21,*) "lat%elec = ", lat%elec(1)
+    write(21,*) "lat%sp = ", lat%sp(1)
+    write(21,*) "--------Outputs of interpolation---------"
+
     do i=1, LAT_SIZE
-!      print *, "ind = ", ind
-!      print *, "ind%emis_sp = ", ind%emis_sp
-      !print *, "T%elec = ", T%elec
       rad_sp(i)=interpolate(ind, ind%emis_sp, x, yarr(i), T%elec, lat%elec(i))*lat%sp(i)
       rad_s2p(i)=interpolate(ind, ind%emis_s2p, x, yarr(i), T%elec, lat%elec(i))*lat%s2p(i)
       rad_s3p(i)=interpolate(ind, ind%emis_s3p, x, yarr(i), T%elec, lat%elec(i))*lat%s3p(i)
@@ -737,7 +741,14 @@ end function az_loss
       ft_rad=ft_rad+rad_tot(i)*lat%elec(i)
       elec_tot=elec_tot + lat%elec(i)
     end do
- 
+    write(21,*) "rad_sp : ", rad_sp(1)
+    write(21,*) "rad_s2p : ", rad_s2p(1)
+    write(21,*) "rad_s3p : ", rad_s3p(1)
+    write(21,*) "rad_op : ", rad_op(1)
+    write(21,*) "rad_o2p : ", rad_o2p(1)
+    write(21,*) "lat%elec : ", lat%elec(1)
+    write(21,*) "ft_rad : ", ft_rad
+    write(21,*) "elec_tot : ", elec_tot
     ft_rad=ft_rad/elec_tot
   end function ft_rad
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!SPACER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -879,7 +890,15 @@ end function az_loss
     ipTot= 2.0 * ipPer * n%elec /3.0
 
     EF_elec= Teq - (2.0 * rad / 3.0) - (dep%transport * n%elec * T%elec) -ipTot
-
+    
+    write(21,*) "----------EF_elec components: -------------------", EF_elec 
+    write(21,*) "Teq : ", Teq
+    write(21,*) "rad : ", rad
+    write(21,*) "dep%transport : ", dep%transport
+    write(21,*) "n%elec", n%elec
+    write(21,*) "T%elec", T%elec
+    write(21,*) "ipTot", ipTot
+   
   end function EF_elec
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!SPACER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   real function EF_sp(n, T, h, ind, dep, v, ft)
@@ -1107,7 +1126,7 @@ subroutine energyBudget(n, h, T, dep, ind, ft, lat, v, nrgy)
   ionh_op  = T%pu_o*ft%ioh/(ROOTPI*h%op)
   cx_op    = T%pu_o*(ft%cx(6) + ft%cx(7) + ft%cx(9) + ft%cx(13) + ft%cx(15))/(ROOTPI*h%op)
   fast_op  = T%op*(ft%cx(6) + ft%cx(10))/(ROOTPI*h%op)
-  print *, "T%op, ft%cx(6), ft%cx(10) = ", T%op, ft%cx(6), ft%cx(10)
+  !rint *, "T%op, ft%cx(6), ft%cx(10) = ", T%op, ft%cx(6), ft%cx(10)
   trans_op = T%op*(dep%transport*n%op)
 
   Teq_o2p = v%sp_o2p*  (T%sp-  T%o2p) + &

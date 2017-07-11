@@ -191,7 +191,7 @@ MODULE TIMESTEP
     EFelec = EF_elec(n, T, h, ind, dep, lat, v, ft)
     updateNT%elec=nrg%elec + dt * EFelec
     call gtzero(updateNT%elec)
-    print *, "nrg%elec, updateNT%elec = ", nrg%elec, updateNT%elec
+    !rint *, "nrg%elec, updateNT%elec = ", nrg%elec, updateNT%elec
 
   end function updateNT
 
@@ -242,7 +242,7 @@ MODULE TIMESTEP
     call gtzero(nTp%o2p )
     nTp%elec  = (nrg%elec  + dt * 0.5 * (EFelec  + EF_elec(n1,T1,h1, ind1,dep1,lat1,nu1, ft1)))
     call gtzero(nTp%elec )
-    print *, "EFelec, EFelec(stuff) = ", EFelec, EF_elec(n1,T1,h1, ind1,dep1,lat1,nu1, ft1)
+    !rint *, "EFelec, EFelec(stuff) = ", EFelec, EF_elec(n1,T1,h1, ind1,dep1,lat1,nu1, ft1)
     !print *, "Teq, rad, dep%transport, n%elec, T%elec, ipTot = ", Teq, rad, dep%transport, n%elec, T%elec, ipTot
        
   end subroutine

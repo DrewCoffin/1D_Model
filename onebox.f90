@@ -335,7 +335,7 @@ zoff = abs((6.4*cos((110-200)*dTOr)*dTOr)*rdist*Rj) !!!!! Matches IDL model
 
 !----------------------hot electrons-------------------------------------------------------------------------------
     if( sys3hot ) then
-      elecHot_multiplier=elecHot_multiplier*(1.0) !+sys3_amp*(cos((290.0-longitude)*dTOr)))
+      elecHot_multiplier=elecHot_multiplier*(1.0) +sys3_amp*(cos((290.0-longitude)*dTOr))
     endif
     
 

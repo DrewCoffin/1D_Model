@@ -670,6 +670,7 @@ nop  = lat_dist.op
 no2p = lat_dist.o2p
 nel  = lat_dist.el
 
+printf,21, '------------Inputs for interpolation------------------'
 ; The electron temperature along a field line is constant for a
 ; Maxwellian distribution. A non-thermal distribution would require
 ; modifying this line to reflect the changing temperature with latitude.
@@ -678,6 +679,11 @@ densindex=100.*alog10(nel)/log5000
 
 ; radiation rates
 emisSp  = interpolate(r_ind.emisSp,tempindex,densindex)
+printf,21,FORMAT = ' ("r_ind.emisSp: ",F0)', r_ind.emisSp(0,0)*1e15
+printf,21,FORMAT = ' ("T.el: ",F0)', T.el
+printf,21,FORMAT = ' ("lat%elec: ",F0)', lat_dist.el(0)
+printf,21,FORMAT = ' ("lat%sp: ",F0)', lat_dist.sp(0)
+printf,21, " --------Outputs of interpolation---------------"
 emisS2p = interpolate(r_ind.emisS2p,tempindex,densindex)
 emisS3p = interpolate(r_ind.emisS3p,tempindex,densindex)
 emisOp  = interpolate(r_ind.emisOp,tempindex,densindex)
@@ -695,6 +701,14 @@ rad_O2p = emisO2p*nO2p
 rad_tot = rad_sp + rad_s2p + rad_s3p + rad_op + rad_o2p
 
 Lavg = total(rad_tot*nel,1)/total(nel,1)
+
+printf,21,FORMAT = '("rad_sp: ",F0)', rad_sp(0)
+printf,21,FORMAT = '("rad_s2p: ",F0)', rad_s2p(0)
+printf,21,FORMAT = '("rad_s3p: ",F0)', rad_s3p(0)
+printf,21,FORMAT = '("rad_op: ",F0)', rad_op(0)
+printf,21,FORMAT = '("rad_o2p: ",F0)', rad_o2p(0)
+printf,21,FORMAT = '("ftrad: ",F0)', total(rad_tot*nel,1)
+printf,21,FORMAT = '("elec_tot: ",F0)', total(nel,1)
 
 return, Lavg
 END
@@ -731,7 +745,6 @@ densindex=100.*alog10(nel)/log5000
 
 ; radiation rates
 emisSp  = interpolate(r_ind.emisSp,tempindex,densindex)
-print, "ind.emisSp = ", r_ind.emisSp
 emisS2p = interpolate(r_ind.emisS2p,tempindex,densindex)
 emisS3p = interpolate(r_ind.emisS3p,tempindex,densindex)
 emisOp  = interpolate(r_ind.emisOp,tempindex,densindex)
@@ -802,6 +815,14 @@ ip_loss = (2./3.) * ip_per_e * n.el
 ; The factor of 2/3 is neccecssary since these quantities are in
 ; energy, but we're really tracking temperature in this code. 
 EF_el = Teq - (2./3.) * rad - r_dep.transport * n.el  * T.el-ip_loss
+
+printf,21,FORMAT = '("----------------EF_elec components: --------------------------- ",F0)', EF_el
+printf,21,FORMAT = '("Teq: ",F0)', Teq
+printf,21,FORMAT = '("rad: ",F0)', rad
+printf,21,FORMAT = '("r_dep.transport: ",F11)', r_dep.transport*1e7
+printf,21,FORMAT = '("n.el: ",F0)', n.el
+printf,21,FORMAT = '("T.el: ",F0)', T.el
+printf,21,FORMAT = '("ip_loss: ",F0)', ip_loss
 
 return,EF_el
 end
@@ -1409,7 +1430,6 @@ nTp.op  = (nT.op  + dt * 0.5 * (EFop  + EF_op(n1,T1,r_ind,r1_dep,h1,nu1, ftint))
 nTp.o2p = (nT.o2p + dt * 0.5 * (EFo2p + EF_o2p(n1,T1,r_ind,r1_dep,h1,nu1, ftint))) > 0.
 nTp.el  = (nT.el  + dt * 0.5 * (EFel  + EF_el(n1,T1,h1, r_ind,r1_dep,lat_dist1,nu1, ftint))) > 0.
 print, "EFel, EFel(stuff) = ", EFel, EF_el(n1,T1,h1, r_ind,r1_dep,lat_dist1,nu1, ftint)
-;print, "Teq, rad, r_dep.transport, n.el, T.el, ip_loss = ", Teq, rad, r_dep.transport, n.el, T.el, ip_loss
 
 update_temp,np,nTp,Tp
 
