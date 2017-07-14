@@ -677,18 +677,29 @@ printf,21, '------------Inputs for interpolation------------------'
 tempindex=unity#(100.*(1.+alog10(T.el))/log5000)
 densindex=100.*alog10(nel)/log5000
 
+printf,21,FORMAT = ' ("r_ind.emisSp: ",F0)', r_ind.emisSp(0,0)*1e15
+printf,21,FORMAT = ' ("Size of r_ind.emisSp: ",F0)', size(r_ind.emisSp)
+printf,21,FORMAT = ' ("T.el: ",F0)', T.el
+printf,21,FORMAT = ' ("lat%elec: ",F0)', lat_dist.el(0)      
+printf,21,FORMAT = ' ("lat%sp: ",F0)', lat_dist.sp(0)   
+printf,21, " --------Outputs of interpolation---------------"
+
+;printf,21,FORMAT = ' ("tempindex: ",F0)', tempindex ;These concur with Fortran
+;printf,21,FORMAT = ' ("densindex: ",F0)', densindex
+
 ; radiation rates
 emisSp  = interpolate(r_ind.emisSp,tempindex,densindex)
-printf,21,FORMAT = ' ("r_ind.emisSp: ",F0)', r_ind.emisSp(0,0)*1e15
-printf,21,FORMAT = ' ("T.el: ",F0)', T.el
-printf,21,FORMAT = ' ("lat%elec: ",F0)', lat_dist.el(0)
-printf,21,FORMAT = ' ("lat%sp: ",F0)', lat_dist.sp(0)
-printf,21, " --------Outputs of interpolation---------------"
 emisS2p = interpolate(r_ind.emisS2p,tempindex,densindex)
 emisS3p = interpolate(r_ind.emisS3p,tempindex,densindex)
 emisOp  = interpolate(r_ind.emisOp,tempindex,densindex)
 emisO2p = interpolate(r_ind.emisO2p,tempindex,densindex)
 
+;misSp  = bilinear(r_ind.emisSp,tempindex,densindex)
+;misS2p = bilinear(r_ind.emisS2p,tempindex,densindex)
+;misS3p = bilinear(r_ind.emisS3p,tempindex,densindex)
+;misOp  = bilinear(r_ind.emisOp,tempindex,densindex)
+;misO2p = bilinear(r_ind.emisO2p,tempindex,densindex)
+;printf,21,FORMAT = '("emisSp: ", F0)', emisSp
 ; total power per cc
 rad_sp  = emisSp*nSp
 rad_s2p = emisS2p*nS2p
@@ -707,6 +718,9 @@ printf,21,FORMAT = '("rad_s2p: ",F0)', rad_s2p(0)
 printf,21,FORMAT = '("rad_s3p: ",F0)', rad_s3p(0)
 printf,21,FORMAT = '("rad_op: ",F0)', rad_op(0)
 printf,21,FORMAT = '("rad_o2p: ",F0)', rad_o2p(0)
+;printf,21,FORMAT = '("rad_tot: ",F0)', rad_tot
+;printf,21,FORMAT = '("nel: ",F0)', nel
+;printf,21,FORMAT = '("rad_tot*nel: ",F0)', rad_tot*nel
 printf,21,FORMAT = '("ftrad: ",F0)', total(rad_tot*nel,1)
 printf,21,FORMAT = '("elec_tot: ",F0)', total(nel,1)
 
@@ -1518,7 +1532,7 @@ pro energy_budget, n, h, T, r_dep, r_ind, ftint, lat_dist, nu, energy;, print = 
   ionh_op  = T.pu_o*ftint.ioh/(!rootpi*h.op)
   cx_op    = T.pu_o*(ftint.cx_k5 + ftint.cx_k6 + ftint.cx_k8 + ftint.cx_k12 + ftint.cx_k14)/(!rootpi*h.op)
   fast_op  = T.op*(ftint.cx_k5 + ftint.cx_k9)/(!rootpi*h.op)
-  print, "T%op, ft%cx(7), ft%cx(10) = ", T.op, ftint.cx_k5, ftint.cx_k9
+  ;print, "T%op, ft%cx(7), ft%cx(10) = ", T.op, ftint.cx_k5, ftint.cx_k9
   trans_op = T.op*(r_dep.transport*n.op)
   
   ; thermal equilibrium of o2p
@@ -1553,7 +1567,7 @@ pro energy_budget, n, h, T, r_dep, r_ind, ftint, lat_dist, nu, energy;, print = 
 
   ; total energy from ionization and charge exchange for both sulfur and oxygen
   energy.s_ion = f*(ion_sp + ionh_sp + ion_s2p + ionh_s2p + ion_s3p + ionh_s3p)
-  ;print, "energy.sp, h_sp, s2p, h_s2p, s3p, h_s3p = ", ion_sp,  ionh_sp,  ion_s2p,  ionh_s2p,  ion_s3p,  ionh_s3p
+  print, "energy.sp, h_sp, s2p, h_s2p, s3p, h_s3p = ", ion_sp,  ionh_sp,  ion_s2p,  ionh_s2p,  ion_s3p,  ionh_s3p
   energy.o_ion = f*(ion_op + ionh_op + ion_o2p + ionh_o2p)
   energy.s_cx  = f*(cx_sp + cx_s2p); + cx_s3p)
   energy.o_cx  = f*(cx_op + cx_o2p)

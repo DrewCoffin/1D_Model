@@ -725,6 +725,8 @@ end function az_loss
     write(21,*) "--------Outputs of interpolation---------"
 
     do i=1, LAT_SIZE
+      !write(21,*) "Temp array = ", x
+      !write(21,*) "Dens array = ", yarr(i)
       rad_sp(i)=interpolate(ind, ind%emis_sp, x, yarr(i), T%elec, lat%elec(i))*lat%sp(i)
       rad_s2p(i)=interpolate(ind, ind%emis_s2p, x, yarr(i), T%elec, lat%elec(i))*lat%s2p(i)
       rad_s3p(i)=interpolate(ind, ind%emis_s3p, x, yarr(i), T%elec, lat%elec(i))*lat%s3p(i)
@@ -799,10 +801,10 @@ end function az_loss
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!SPACER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   real function interpolate(ind, table, tl, nl, t, n)
     type(r_ind)       ::ind
-    double precision  ::t, n
+    double precision  ::t, n, t2, n2
     integer           ::ti, ni !x and y indices for table search
     real              ::tgt, tlt, ngt, nlt, table(EMIS_SIZE, EMIS_SIZE) !temperature greater than, less than, same for density....etc.
-    double precision  ::tslope, nslope
+    double precision  ::tslope, nslope, upperleft, upperright, lowerleft, lowerright, righttop, rightbot, deltemp, deldens, coeff
     real              ::tl, nl
 
    ti=INT(tl)
@@ -814,9 +816,20 @@ end function az_loss
    if(ni < 1) ni=1
 
    tgt=ind%emis_temp(ti+1)
-   tlt=ind%emis_temp(ti)
+   tlt=ind%emis_temp(ti)  
    ngt=ind%emis_dens(ni+1)
-   nlt=ind%emis_dens(ni)
+   nlt=ind%emis_dens(ni)  
+
+   !write(21,*), "tl = ", tl
+   !write(21,*), "ind%emis_temp(tl) = ", ind%emis_temp(tl)
+   !write(21,*) "tgt = ", tgt
+   !write(21,*) "t = ", t
+   !write(21,*) "tlt = ",tlt
+   !write(21,*), "nl = ", nl
+   !write(21,*), "ind%emis_dens(nl) = ", ind%emis_dens(nl)
+   !write(21,*) "ngt = ", ngt
+   !write(21,*) "n = ", n
+   !write(21,*) "nlt = ",nlt
 
    if ( t > ind%emis_temp(EMIS_SIZE) .or. n > ind%emis_dens(EMIS_SIZE) .or. t < ind%emis_temp(1) .or. n < ind%emis_dens(1) ) then
      if ( .not. HUSH ) then !THIS VARIABLE IS SET IN THE DEBUG MODULE
@@ -826,19 +839,31 @@ end function az_loss
      endif
    endif
 
+    !upperleft = table(ti+1, ni)
+    !upperright = table(ti+1,ni+1)
+    !lowerleft = table(ti, ni)
+    !lowerright = table(ti, ni+1)
+
+    !righttop = upperleft*(ngt-n) + upperright*(n-nlt)
+    !rightbot = lowerleft*(ngt-n) + lowerright*(n-nlt)
+
+    !coeff = 1/((tgt-tlt)*(ngt-nlt))
+
+    !interpolate = coeff*( (tgt-t)*righttop + (t-tlt)*rightbot )
+
     tslope=((table(ti+1,ni+1)-table(ti, ni+1))*(1.0-((ngt-n)/(ngt-nlt))) &
           +(table(ti+1,ni)-table(ti,ni))*(1.0-((n-nlt)/(ngt-nlt))))/(tgt-tlt)
     nslope=((table(ti+1,ni+1)-table(ti+1 ,(ni)))*(1.0-((tgt-t)/(tgt-tlt))) &
           +(table(ti,ni+1)-table(ti,ni))*(1.0-((t-tlt)/(tgt-tlt))))/(ngt-nlt)
 
     if ( (tgt-t >= t-tlt) .and. (ngt-n) >= (n-nlt) ) then
-      interpolate= table(ti,ni) + (n-nlt)*nslope + (t-tlt)*tslope
+       interpolate= table(ti,ni) + (n-nlt)*nslope + (t-tlt)*tslope
     elseif ( (t-tlt) > (tgt-t) .and. (ngt-n) >= (n-nlt) ) then
-      interpolate= table(ti+1,ni) + (n-nlt)*nslope - (tgt-t)*tslope
+       interpolate= table(ti+1,ni) + (n-nlt)*nslope - (tgt-t)*tslope
     elseif ( (tgt-t) >= (t-tlt) .and. (n-nlt) > (ngt-n) ) then
-      interpolate= table(ti,ni+1) - (ngt-n)*nslope + (t-tlt)*tslope
-    elseif ( (t-tlt) > (tgt-t) .and. (t-tlt) > (tgt-t) ) then
-      interpolate= table(ti+1,ni+1) - (ngt-n)*nslope - (tlt-t)*tslope
+       interpolate= table(ti,ni+1) - (ngt-n)*nslope + (t-tlt)*tslope
+    elseif ( (t-tlt) > (tgt-t) .and. (n-nlt) > (ngt-n) ) then
+       interpolate= table(ti+1,ni+1) - (ngt-n)*nslope - (tgt-t)*tslope !changed
     endif
 
   end function interpolate
