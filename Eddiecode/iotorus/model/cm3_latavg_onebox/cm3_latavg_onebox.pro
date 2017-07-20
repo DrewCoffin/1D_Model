@@ -292,7 +292,7 @@ endif else begin
     printf,21,FORMAT = '("otos: ",I0)', otos ;;;;;
 
 ; Total electron density
-    n.el = (n.sp + 2 * n.s2p + 3 * n.s3p + n.op + 2 * n.o2p) * (1.-n.protons)
+    n.el = (n.sp + 2 * n.s2p + 3 * n.s3p + n.op + 2 * n.o2p) / (1.-n.protons)
     ;printf,21,FORMAT = '("n.protons: ",F0)', n.protons ;;;;
     printf,21,FORMAT = '("n.el: ",I0)', n.el ;;;;;
     n.elh = n.fh/(1.-n.fh) * n.el               ; Hot electron density
@@ -449,7 +449,7 @@ printf,21,FORMAT = '("n.fc: ",I0)', n.fc ;;;;;
 ;  Ensure charge neutrality in the thermal electron population. We
 ;  assume that the hot electrons are linked to a separate hot proton population.
 ;n.el = (n.sp + 2.*n.s2p + 3.*n.s3p + 4.*n.s4p + n.op + 2.*n.o2p)/(1.-n.protons)
-n.el = (n.sp + 2.*n.s2p + 3.*n.s3p + n.op + 2.*n.o2p)*(1.-n.protons)
+n.el = (n.sp + 2.*n.s2p + 3.*n.s3p + n.op + 2.*n.o2p)/(1.-n.protons)
 printf,21,FORMAT = '("n.el: ",I0)', n.el ;;;;;
 n.elh = n.fh/(1.-n.fh) * n.el
 printf,21,FORMAT = '("n.elh: ",I0)', n.elh ;;;;;

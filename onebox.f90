@@ -176,7 +176,7 @@ zoff = abs((6.4*cos((110-200)*dTOr)*dTOr)*rdist*Rj) !!!!! Matches IDL model
   !net_source = 6.3e6 !!!!! set to match idl calculation independant of volume
   write(21,*) "net_source: ",net_source !!!!!
   print *, net_source
-  n%elec = (n%sp + n%op + (2.0 * (n%s2p + n%o2p)) + (3.0 * n%s3p)) * (1.0 - protons)
+  n%elec = (n%sp + n%op + (2.0 * (n%s2p + n%o2p)) + (3.0 * n%s3p)) / (1.0 - protons)
   write(21,*) "n%elec: ",n%elec !!!!!
   n%elecHot = n%fh * n%elec / (1.0-n%fh)
   write(21,*) "n%elecHot: ",n%elecHot !!!!!
@@ -250,7 +250,7 @@ zoff = abs((6.4*cos((110-200)*dTOr)*dTOr)*rdist*Rj) !!!!! Matches IDL model
   write(21,*) "n%op: ",n%op !!!!!   
   write(21,*) "n%o2p: ",n%o2p !!!!!   
   write(21,*) "protons: ", protons !!!!!
-  n%elec = ((n%sp + n%op) + 2.0*(n%s2p + n%o2p) + 3.0 * n%s3p)*(1.0-n%protons)
+  n%elec = ((n%sp + n%op) + 2.0*(n%s2p + n%o2p) + 3.0 * n%s3p)/(1.0-n%protons)
   write(21,*) "n%elec: ",n%elec !!!!!
   n%elecHot = n%elec * n%fh/n%fc
   write(21,*) "n%elecHot: ",n%elecHot !!!!!
