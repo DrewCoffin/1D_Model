@@ -62,7 +62,7 @@ MODULE TIMESTEP
     v%o2p_elecHot= nu_ehi(elecHot, T%elecHot, lat%o2p, T%o2p, 2.0, 16.0)
 
     v%elec_elecHot= nu_ee(lat%elec, T%elec, elecHot, T%elecHot) 
-    
+!    print *, "UpdateNu v%elec_elecHot: ", v%elec_elecHot
 
   end subroutine updateNu
 
@@ -111,6 +111,7 @@ MODULE TIMESTEP
 
     v%elec_elecHot= nu_ee(lat%elec, T%elec, n%elecHot, T%elecHot)
 
+ !   print *, "stepNu v%elec_elecHot: ", v%elec_elecHot
   end subroutine stepNu
 
 
@@ -293,7 +294,7 @@ MODULE TIMESTEP
     n = np
     nrg = nTp
     T = Tp
-
+  
 !    call az_transport(n, nrg)
 
   end subroutine cm3_latavg_model

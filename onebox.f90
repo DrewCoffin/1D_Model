@@ -122,7 +122,7 @@ subroutine model()
   write(21,*) "Rj: ", Rj
 !!!!!  zoff= abs((6.4*cos((lon3-longitude)*dTOr)*dTOr) * rdist * Rj) !in km (This calculation depends on mype, before switch to mathc idl model
 
-zoff = abs((6.4*cos((110-200)*dTOr)*dTOr)*rdist*Rj) !!!!! Matches IDL model
+  zoff = abs((6.4*cos((110-200)*dTOr)*dTOr)*rdist*Rj) !!!!! Matches IDL model
   write(21,*) "zoff: ",zoff !!!!! 
   n_height = Rj/2.0
 
@@ -171,7 +171,7 @@ zoff = abs((6.4*cos((110-200)*dTOr)*dTOr)*rdist*Rj) !!!!! Matches IDL model
   write(21,*) "n%fh: ",n%fh !!!!!
   trans = 1.646851e-7 !4.62963e-7
   write(21,*) "trans: ",trans !!!!!
-  !net_source=source/volume
+!  net_source=source*volume
   net_source = source !!!!!
   !net_source = 6.3e6 !!!!! set to match idl calculation independant of volume
   write(21,*) "net_source: ",net_source !!!!!

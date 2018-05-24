@@ -19,7 +19,7 @@ MODULE varTypes
   parameter(mpg=1.672621e-24) !grams 
   parameter(me=9.109381e-31)  !kg
   parameter(meg=9.109381e-28) !grams
-  parameter(LNG_GRID=2)       !number of longitudinal slices of the torus
+  parameter(LNG_GRID=24)       !number of longitudinal slices of the torus
 !  parameter()      
 
 

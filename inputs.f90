@@ -18,7 +18,7 @@ subroutine readInputs()
   open(unit=100, file='inputs.dat', status='old')
 
   read(100,*) source
-!  source = source *0.5* ROOTPI * Rj * 100000.0
+  source = source *0.5* ROOTPI * Rj * 100000.0
   read(100,*) o_to_s
   read(100,*) fehot_const  !declared in global module
   read(100,*) transport

@@ -742,6 +742,7 @@ end function az_loss
 !      print *, "rad_sp(i) == ", rad_sp(i)
       ft_rad=ft_rad+rad_tot(i)*lat%elec(i)
       elec_tot=elec_tot + lat%elec(i)
+      write(21,*) "rad_sp(i) : ", rad_sp(i)
     end do
     write(21,*) "rad_sp : ", rad_sp(1)
     write(21,*) "rad_s2p : ", rad_s2p(1)
@@ -839,18 +840,6 @@ end function az_loss
      endif
    endif
 
-    !upperleft = table(ti+1, ni)
-    !upperright = table(ti+1,ni+1)
-    !lowerleft = table(ti, ni)
-    !lowerright = table(ti, ni+1)
-
-    !righttop = upperleft*(ngt-n) + upperright*(n-nlt)
-    !rightbot = lowerleft*(ngt-n) + lowerright*(n-nlt)
-
-    !coeff = 1/((tgt-tlt)*(ngt-nlt))
-
-    !interpolate = coeff*( (tgt-t)*righttop + (t-tlt)*rightbot )
-
     tslope=((table(ti+1,ni+1)-table(ti, ni+1))*(1.0-((ngt-n)/(ngt-nlt))) &
           +(table(ti+1,ni)-table(ti,ni))*(1.0-((n-nlt)/(ngt-nlt))))/(tgt-tlt)
     nslope=((table(ti+1,ni+1)-table(ti+1 ,(ni)))*(1.0-((tgt-t)/(tgt-tlt))) &
@@ -917,6 +906,8 @@ end function az_loss
     EF_elec= Teq - (2.0 * rad / 3.0) - (dep%transport * n%elec * T%elec) -ipTot
     
     write(21,*) "----------EF_elec components: -------------------", EF_elec 
+    write(21,*) "v%elec_elecHot :", v%elec_elecHot
+    write(21,*) "T%elecHot : ", T%elecHot
     write(21,*) "Teq : ", Teq
     write(21,*) "rad : ", rad
     write(21,*) "dep%transport : ", dep%transport

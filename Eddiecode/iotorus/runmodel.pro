@@ -8,7 +8,7 @@ Pro runmodel
   tot2cms = sqrt(!dpi)*0.5*!rjkm*1e5
   dtor = !dpi/180.0
   ; create structure to hold all input parameters
-  input = create_struct( 'source', 7.20e-4*tot2cms, $ ; [# cm^-3 s^-1]
+  input = create_struct( 'source', 12.0e-4*tot2cms, $ ; [# cm^-3 s^-1]
                          'o_to_s',     1.7    , $ ; ratio
                     'fehot_const',     0.003  , $ ; fraction of hot e
                       'transport',    50.0     , $ ; [days]
@@ -32,8 +32,8 @@ Pro runmodel
   cm3_latavg_onebox, n_out, t_out, h_out, f_out, r_ind, r_dep, energy, $
                      /plot, /printiter, $
                      tm   = 0.01, $
-                     ;runt = 500., $ latest dataset
-                     runt = 1., $
+                     runt = 200., $ latest dataset
+                     ;runt = 1., $
                      /Nosave, $
                      ;filename = '_dim10_5-5', $
                      source = input.source, o_to_s = input.o_to_s, fehot_const = input.fehot_const, $

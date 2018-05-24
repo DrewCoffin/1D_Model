@@ -1,7 +1,7 @@
 #!/bin/bash
 
-npes=2
-days=1  
+npes=24
+days=5000 
 
 ./changeDimension.sh $npes
 
@@ -26,12 +26,12 @@ if [ $? -eq 0 ]
 
     cd plots
 
-      ./plotifyWload $days DENS
-      mv animated.avi ../dens.avi
-      ./plotify $days MIXR
-      mv animated.avi ../mixr.avi
-      ./plotify $days TEMP	
-      mv animated.avi ../temp.avi
+#      ./plotifyWload $days DENS
+#      mv animated.avi ../dens.avi
+#      ./plotify $days MIXR
+#      mv animated.avi ../mixr.avi
+#      ./plotify $days TEMP	
+#      mv animated.avi ../temp.avi
 #      ./plotify $days INTS
 #      mv animated.avi ../intensity.avi
 #      ./overlay $days 

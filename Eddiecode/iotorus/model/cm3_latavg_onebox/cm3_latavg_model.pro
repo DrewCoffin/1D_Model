@@ -713,7 +713,7 @@ rad_tot = rad_sp + rad_s2p + rad_s3p + rad_op + rad_o2p
 
 Lavg = total(rad_tot*nel,1)/total(nel,1)
 
-printf,21,FORMAT = '("rad_sp: ",F0)', rad_sp(0)
+printf,21,FORMAT = '("rad_sp: ",F0)', rad_sp
 printf,21,FORMAT = '("rad_s2p: ",F0)', rad_s2p(0)
 printf,21,FORMAT = '("rad_s3p: ",F0)', rad_s3p(0)
 printf,21,FORMAT = '("rad_op: ",F0)', rad_op(0)
@@ -831,6 +831,8 @@ ip_loss = (2./3.) * ip_per_e * n.el
 EF_el = Teq - (2./3.) * rad - r_dep.transport * n.el  * T.el-ip_loss
 
 printf,21,FORMAT = '("----------------EF_elec components: --------------------------- ",F0)', EF_el
+printf,21,FORMAT = '("nu.el_elh: ",F0)', nu.el_elh*1e5
+printf,21,FORMAT = '("T.elh: ",F0)', T.elh
 printf,21,FORMAT = '("Teq: ",F0)', Teq
 printf,21,FORMAT = '("rad: ",F0)', rad
 printf,21,FORMAT = '("r_dep.transport: ",F11)', r_dep.transport*1e7
